@@ -7,14 +7,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {IAppConfig} from './app-config';
 
-let config: IAppConfig = null;
+let configFile: string = null;
 
-if (process.argv.length < 3) {
-    console.error("config file not optional!");
-    process.exit(1);
-}
+if (process.argv.length < 3)
+    configFile = path.join(__dirname, "../../configs/local-testing-config.json");
+else
+    configFile = process.argv[2];
 
-config = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+let config: IAppConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 
 let app = express();
 

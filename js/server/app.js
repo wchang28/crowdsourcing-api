@@ -6,12 +6,13 @@ var bodyParser = require("body-parser");
 var noCache = require("no-cache-express");
 var prettyPrinter = require("express-pretty-print");
 var fs = require("fs");
-var config = null;
-if (process.argv.length < 3) {
-    console.error("config file not optional!");
-    process.exit(1);
-}
-config = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+var path = require("path");
+var configFile = null;
+if (process.argv.length < 3)
+    configFile = path.join(__dirname, "../../configs/local-testing-config.json");
+else
+    configFile = process.argv[2];
+var config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 var app = express();
 app.set('jsonp callback name', 'cb');
 app.use(noCache);
