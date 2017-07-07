@@ -48,8 +48,8 @@ app.options("/*", (req: express.Request, res: express.Response) => {
 
 startServer(config.webServerConfig, app, (secure:boolean, host:string, port:number) => {
     let protocol = (secure ? 'https' : 'http');
-    console.log(new Date().toISOString() + ': system integration server listening at %s://%s:%s', protocol, host, port);
+    console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
 }, (err:any) => {
-    console.error(new Date().toISOString() + ': !!! system integration server error: ' + JSON.stringify(err));
+    console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
     process.exit(1);
 });
