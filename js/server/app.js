@@ -33,6 +33,14 @@ app.options("/*", function (req, res) {
     res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Content-Length,X-Requested-With');
     res.send(200);
 });
+//console.log("env=\n" + JSON.stringify(process.env, null, 2) + "\n");
+console.log("NODE_PATH=" + process.env["NODE_PATH"]);
+var uuid = require("uuid");
+console.log(uuid.v4());
+var mod_id = require.resolve("uuid");
+console.log("mod_id=" + mod_id);
+var mod = (require.cache[mod_id]);
+console.log(mod.filename);
 //app.set("global", g);
 //app.use('/services', servicesRouter);
 express_web_server_1.startServer(config.webServerConfig, app, function (secure, host, port) {

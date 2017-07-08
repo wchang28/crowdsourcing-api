@@ -42,6 +42,17 @@ app.options("/*", (req: express.Request, res: express.Response) => {
     res.send(200);
 });
 
+//console.log("env=\n" + JSON.stringify(process.env, null, 2) + "\n");
+console.log("NODE_PATH=" + process.env["NODE_PATH"]);
+
+const uuid = require("uuid");
+console.log(uuid.v4());
+
+let mod_id =require.resolve("uuid");
+console.log("mod_id=" + mod_id);
+let mod = <NodeModule>(require.cache[mod_id]);
+console.log(mod.filename);
+
 //app.set("global", g);
 
 //app.use('/services', servicesRouter);
