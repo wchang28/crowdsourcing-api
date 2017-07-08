@@ -11,6 +11,13 @@ export interface IServerManager {
     on(event: "instance-launched", listener: (Instance: ServerInstance) => void): any;
     on(event: "instance-terminated", listener: (Instance: ServerInstance) => void): any;
 }
+export interface StateMachineJSON {
+    State: State;
+    ServerInstance: ServerInstance;
+    CurrentServer: Server;
+    NewServer: Server;
+    OldServer: Server;
+}
 export interface IStateMachine {
     readonly State: State;
     switch(): Promise<any>;
@@ -18,7 +25,7 @@ export interface IStateMachine {
     readonly CurrentServer: Server;
     readonly NewServer: Server;
     readonly OldServer: Server;
-    toJSON(): any;
+    toJSON(): StateMachineJSON;
     on(event: "change", listener: () => void): this;
     on(event: "ready", listener: () => void): this;
     on(event: "error", listener: (err: any) => void): this;

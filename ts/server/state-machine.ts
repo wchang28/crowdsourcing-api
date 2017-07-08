@@ -18,6 +18,14 @@ export interface IServerManager {
     on(event: "instance-terminated", listener: (Instance: ServerInstance) => void);
 }
 
+export interface StateMachineJSON {
+    State: State;
+    ServerInstance: ServerInstance;
+    CurrentServer: Server;
+    NewServer: Server;
+    OldServer: Server;
+}
+
 export interface IStateMachine {
     readonly State: State;
     switch() : Promise<any>;
@@ -25,7 +33,7 @@ export interface IStateMachine {
     readonly CurrentServer : Server;
     readonly NewServer : Server;
     readonly OldServer : Server;
-    toJSON() : any;
+    toJSON() : StateMachineJSON;
     on(event: "change", listener: () => void) : this;
     on(event: "ready", listener: () => void) : this;
     on(event: "error", listener: (err: any) => void) : this;
@@ -141,7 +149,7 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
     get CurrentServer() : Server {return this._currentServer;}
     get NewServer() : Server {return this._newServer;}
     get OldServer() : Server {return this._oldServer;}
-    toJSON() : any {
+    toJSON() : StateMachineJSON {
         return {
             State: this.State
             ,ServerInstance: this.ServerInstance
