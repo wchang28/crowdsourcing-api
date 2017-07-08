@@ -25,6 +25,33 @@ app.use(bodyParser.text({"limit":"999mb"}));
 app.use(bodyParser.json({"limit":"999mb"}));
 app.use(prettyPrinter.get());
 
+let count = 0;
+
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    count++;
+    console.log("\n<<count++>> count=" + count.toString());
+    req.on("end", () => {
+        console.log("req => <<end>>");
+        count--;
+        console.log("<<count-->> count=" + count.toString());
+    }).on("close", () => {
+        console.log("req => <<close>>");
+    }).on("error", (err: any) => {
+        console.log("req => <<error>>, err=" + JSON.stringify(err));
+    });
+
+    res.on("finish", () => {
+        console.log("res => <<finish>>");
+    }).on("close", () => {
+        console.log("res => <<close>>");
+        count--;
+        console.log("<<count-->> count=" + count.toString());
+    }).on("error", (err: any) => {
+        console.log("res => <<error>>, err=" + JSON.stringify(err));
+    });
+    next();
+});
+
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.log("\n" + new Date().toISOString() + ': method=' + req.method + ', url=' + req.url + "\nheaders=\n" + JSON.stringify(req.headers, null, 2));
     next();
@@ -52,6 +79,12 @@ let mod_id =require.resolve("uuid");
 console.log("mod_id=" + mod_id);
 let mod = <NodeModule>(require.cache[mod_id]);
 console.log(mod.filename);
+
+app.get("/hi", (req: express.Request, res: express.Response) => {
+    setTimeout(() => {
+        res.jsonp({msg: "How are you?"});
+    }, 10000);
+});
 
 //app.set("global", g);
 
