@@ -6,6 +6,7 @@ import * as prettyPrinter from 'express-pretty-print';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IAppConfig} from './app-config';
+import * as sm from "./state-machine";
 
 let configFile: string = null;
 

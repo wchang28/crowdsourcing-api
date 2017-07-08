@@ -55,6 +55,7 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
                     this._newServer.State = "ready";
                     this._currentServer = this._newServer;
                     this._newServer = null;
+                    this.emit("ready");
                 } else {    // "switching" => // "swtiched"
                     this._oldServer = this._currentServer;
                     this._oldServer.State = "terminating";
@@ -68,8 +69,6 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
                     this._newServerLaunchCompletionCallback = null;
                 }
                 this.emit("change");
-                if (this.State === "ready")
-                    this.emit("ready");
             }
         }).on("instance-terminated", (Instance: ServerInstance) => {
             if (this.State === "switched") {
