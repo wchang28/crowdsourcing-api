@@ -27,6 +27,7 @@ export interface IStateMachine {
     readonly OldServer : Server;
     toJSON() : any;
     on(event: "change", listener: () => void) : this;
+    on(event: "ready", listener: () => void) : this;
     on(event: "error", listener: (err: any) => void) : this;
 }
 
@@ -67,10 +68,13 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
                     this._newServerLaunchCompletionCallback = null;
                 }
                 this.emit("change");
+                if (this.State === "ready")
+                    this.emit("ready");
             }
         }).on("instance-terminated", (Instance: ServerInstance) => {
             if (this.State === "switched") {
                 this._oldServer = null;
+                // back to "ready"
                 this.emit("change");
             }
         });
