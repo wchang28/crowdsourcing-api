@@ -20,6 +20,7 @@ export interface StateMachineJSON {
 }
 export interface IStateMachine {
     readonly State: State;
+    initialize(): Promise<ServerInstance>;
     deploy(): Promise<any>;
     readonly ServerInstance: ServerInstance;
     readonly CurrentServer: Server;

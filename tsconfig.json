@@ -15,6 +15,7 @@
   },
   "files": [
     "./ts/index.ts",
-    "./ts/server/app.ts"
+    "./ts/server/gateway/app.ts",
+    "./ts/server/api/app.ts"
   ]
 }

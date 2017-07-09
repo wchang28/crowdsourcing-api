@@ -28,6 +28,7 @@ export interface StateMachineJSON {
 
 export interface IStateMachine {
     readonly State: State;
+    initialize() : Promise<ServerInstance>;
     deploy() : Promise<any>;
     readonly ServerInstance : ServerInstance;
     readonly CurrentServer : Server;
@@ -85,8 +86,12 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
                 this.emit("change");
             }
         });
-
-        this.launchNewServer();
+    }
+    initialize() : Promise<ServerInstance> {
+        if (this.State != "uninitizlized")
+            return Promise.reject({error: "invalid-request", error_description: "already initialized"});
+        else
+            return this.launchNewServer();
     }
     get State() : State {
         if (this._currentServer === null && this._newServer === null && this._oldServer === null)

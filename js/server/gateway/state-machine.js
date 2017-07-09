@@ -57,9 +57,14 @@ var StateMachine = (function (_super) {
                 _this.emit("change");
             }
         });
-        _this.launchNewServer();
         return _this;
     }
+    StateMachine.prototype.initialize = function () {
+        if (this.State != "uninitizlized")
+            return Promise.reject({ error: "invalid-request", error_description: "already initialized" });
+        else
+            return this.launchNewServer();
+    };
     Object.defineProperty(StateMachine.prototype, "State", {
         get: function () {
             if (this._currentServer === null && this._newServer === null && this._oldServer === null)
