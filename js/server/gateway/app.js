@@ -20,6 +20,7 @@ var path = require("path");
 var events = require("events");
 var server_mgr_1 = require("./server-mgr");
 var sm = require("./state-machine");
+var msg_1 = require("./msg");
 var configFile = null;
 if (process.argv.length < 3)
     configFile = path.join(__dirname, "../../../configs/local-testing-config.json");
@@ -31,6 +32,7 @@ appMsg.set('jsonp callback name', 'cb');
 appMsg.use(noCache);
 appMsg.use(bodyParser.json({ "limit": "999mb" }));
 appMsg.use(prettyPrinter.get());
+appMsg.use('/msg', msg_1.Router);
 express_web_server_1.startServer(config.msgServerConfig, appMsg, function (secure, host, port) {
     var protocol = (secure ? 'https' : 'http');
     console.log(new Date().toISOString() + ': api gateway msg server listening at %s://%s:%s', protocol, host, port);
@@ -38,21 +40,34 @@ express_web_server_1.startServer(config.msgServerConfig, appMsg, function (secur
     console.error(new Date().toISOString() + ': !!! api gateway msg server error: ' + JSON.stringify(err));
     process.exit(1);
 });
-/*
-    notifyToTerminate(InstanceId: string): void;
-    on(event: "instance-launched", listener: (InstanceId: sm.ServerId) => void) : this;
-    on(event: "instance-terminated", listener: (InstanceId: sm.ServerId) => void): this;
-*/
 var ServerMessenger = (function (_super) {
     __extends(ServerMessenger, _super);
-    function ServerMessenger() {
-        return _super.call(this) || this;
+    function ServerMessenger(connectionsManager) {
+        var _this = _super.call(this) || this;
+        _this.connectionsManager = connectionsManager;
+        _this.connectionsManager.on("on_client_send_msg", function (req, connection, params) {
+            if (params.destination === '/topic/gateway') {
+                var msg = params.body;
+                if (msg.type === "ready") {
+                    var content = msg.contnet;
+                    var InstanceId = content.InstanceId;
+                    connection.cookie = InstanceId;
+                    _this.emit("instance-launched", InstanceId);
+                }
+            }
+        }).on("client_disconnect", function (req, connection) {
+            var InstanceId = connection.cookie;
+            _this.emit("instance-terminated", InstanceId);
+        });
+        return _this;
     }
     ServerMessenger.prototype.notifyToTerminate = function (InstanceId) {
+        var msg = { type: "terminate" };
+        this.connectionsManager.dispatchMessage("/topic/" + InstanceId, {}, msg);
     };
     return ServerMessenger;
 }(events.EventEmitter));
-var stateMachine = sm.get(server_mgr_1.get(config.availableApiServerPorts, new ServerMessenger()));
+var stateMachine = sm.get(server_mgr_1.get(config.availableApiServerPorts, new ServerMessenger(msg_1.ConnectionsManager)));
 stateMachine.on("ready", function () {
     var appProxy = express();
 });

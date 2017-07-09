@@ -23,6 +23,7 @@
     "express-web-server": "git+https://github.com/wchang28/express-web-server.git",
     "lodash": "^4.17.4",
     "no-cache-express": "git+https://github.com/wchang28/no-cache-express.git",
+    "rcf-message-router": "https://github.com/wchang28/rcf-message-router.git",
     "uuid": "^3.1.0"
   }
 }

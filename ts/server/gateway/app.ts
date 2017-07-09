@@ -9,6 +9,9 @@ import {IAppConfig} from './app-config';
 import * as events from "events";
 import {get as getServerManager, IServerMessenger} from "./server-mgr";
 import * as sm from "./state-machine";
+import * as tr from 'rcf-message-router';
+import {Router as msgRouter, ConnectionsManager} from "./msg";
+import {Message, ServerId, ReadyContent} from "./message";
 
 let configFile: string = null;
 
@@ -25,6 +28,8 @@ appMsg.use(noCache);
 appMsg.use(bodyParser.json({"limit":"999mb"}));
 appMsg.use(prettyPrinter.get());
 
+appMsg.use('/msg', msgRouter);
+
 startServer(config.msgServerConfig, appMsg, (secure:boolean, host:string, port:number) => {
     let protocol = (secure ? 'https' : 'http');
     console.log(new Date().toISOString() + ': api gateway msg server listening at %s://%s:%s', protocol, host, port);
@@ -33,21 +38,31 @@ startServer(config.msgServerConfig, appMsg, (secure:boolean, host:string, port:n
     process.exit(1);
 });
 
-/*
-    notifyToTerminate(InstanceId: string): void;
-    on(event: "instance-launched", listener: (InstanceId: sm.ServerId) => void) : this;
-    on(event: "instance-terminated", listener: (InstanceId: sm.ServerId) => void): this;
-*/
 class ServerMessenger extends events.EventEmitter implements IServerMessenger {
-    constructor() {
+    constructor(private connectionsManager: tr.IConnectionsManager) {
         super();
+        this.connectionsManager.on("on_client_send_msg", (req:express.Request, connection: tr.ITopicConnection, params: tr.SendMsgParams) => {
+            if (params.destination === '/topic/gateway') {
+                let msg:Message = params.body;
+                if (msg.type === "ready") {
+                    let content: ReadyContent = msg.contnet;
+                    let InstanceId = content.InstanceId;
+                    connection.cookie = InstanceId;
+                    this.emit("instance-launched", InstanceId);
+                }
+            }
+        }).on("client_disconnect", (req:express.Request, connection: tr.ITopicConnection) => {
+            let InstanceId: ServerId = connection.cookie;
+            this.emit("instance-terminated", InstanceId);
+        });
     }
     notifyToTerminate(InstanceId: string): void {
-
+        let msg: Message = {type: "terminate"};
+        this.connectionsManager.dispatchMessage("/topic/"+ InstanceId, {}, msg);
     }
 }
 
-let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, new ServerMessenger()));
+let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, new ServerMessenger(ConnectionsManager)));
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
     let appProxy = express();
 

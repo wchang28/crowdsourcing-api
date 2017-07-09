@@ -3,16 +3,17 @@ import * as sm from "./state-machine";
 import * as uuid from "uuid";
 import * as cp from "child_process"; 
 import * as path from 'path';
+import {ServerId} from "./message";
 
 export interface IServerMessenger {
     notifyToTerminate(InstanceId: string): void;
-    on(event: "instance-launched", listener: (InstanceId: sm.ServerId) => void) : this;
-    on(event: "instance-terminated", listener: (InstanceId: sm.ServerId) => void): this;
+    on(event: "instance-launched", listener: (InstanceId: ServerId) => void) : this;
+    on(event: "instance-terminated", listener: (InstanceId: ServerId) => void): this;
 }
 
 interface PortItem {
     Port: number;
-    InstanceId: sm.ServerId;
+    InstanceId: ServerId;
 }
 
 class ServerManager extends events.EventEmitter implements sm.IServerManager {
@@ -20,9 +21,9 @@ class ServerManager extends events.EventEmitter implements sm.IServerManager {
     constructor(availablePorts: [number, number], private serverMessenger: IServerMessenger) {
         super();
         this._ports = [{Port:availablePorts[0], InstanceId: null}, {Port:availablePorts[1], InstanceId: null}];
-        this.serverMessenger.on("instance-launched", (InstanceId: sm.ServerId) => {
+        this.serverMessenger.on("instance-launched", (InstanceId: ServerId) => {
             this.emit("instance-launched", InstanceId);
-        }).on("instance-terminated", (InstanceId: sm.ServerId) => {
+        }).on("instance-terminated", (InstanceId: ServerId) => {
             for (let i in this._ports) {
                 if (this._ports[i].InstanceId === InstanceId) {
                     this._ports[i].InstanceId = null;
@@ -32,12 +33,12 @@ class ServerManager extends events.EventEmitter implements sm.IServerManager {
             this.emit("instance-terminated", InstanceId);
         })
     }
-    private useAvailablePort(InstanceId: sm.ServerId) : number {
+    private useAvailablePort(InstanceId: ServerId) : number {
         let index = (!this._ports[0].InstanceId ? 0 : 1);
         this._ports[index].InstanceId = InstanceId;
         return this._ports[index].Port;
     }
-    private launchInstance(InstanceId: sm.ServerId, Port: number) : Promise<any> {
+    private launchInstance(InstanceId: ServerId, Port: number) : Promise<any> {
         let apiAppScript = path.join(__dirname, "../api/app.js");
         cp.spawn("node.exe", [apiAppScript, InstanceId, Port.toString()]);
         return Promise.resolve<any>(null);

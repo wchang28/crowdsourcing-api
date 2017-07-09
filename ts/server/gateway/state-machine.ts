@@ -1,10 +1,10 @@
+import {ServerId} from "./message";
 import * as events from "events";
 
 export type State = "uninitizlized" | "initializing" | "ready" | "switching" | "switched";
 
 export type ServerState = "initializing" | "ready" | "terminating";
 
-export type ServerId = string;
 export interface ServerInstance {
     Id: ServerId;
     InstanceUrl: string;
