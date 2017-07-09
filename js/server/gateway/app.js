@@ -82,7 +82,6 @@ stateMachine.on("ready", function () {
     express_web_server_1.startServer(config.proxyServerConfig, appProxy, function (secure, host, port) {
         var protocol = (secure ? 'https' : 'http');
         console.log(new Date().toISOString() + ': api gateway proxy server listening at %s://%s:%s', protocol, host, port);
-        stateMachine.initialize();
     }, function (err) {
         console.error(new Date().toISOString() + ': !!! api gateway proxy server error: ' + JSON.stringify(err));
         process.exit(1);
