@@ -14,8 +14,8 @@ destAuthRouter.get("/topic/:InstanceId", tr.destAuth(function (req, res) {
 }));
 var options = {
     connKeepAliveIntervalMS: 10000,
-    dispatchMsgOnClientSend: false,
-    destinationAuthorizeRouter: destAuthRouter
+    dispatchMsgOnClientSend: false
+    //,destinationAuthorizeRouter: destAuthRouter
 };
 var ret = tr.get('/', options);
 router.use('/events', ret.router); // topic subscription endpoint is available at /events from this route

@@ -18,7 +18,7 @@ destAuthRouter.get("/topic/:InstanceId", tr.destAuth((req: tr.DestAuthRequest, r
 let options: tr.Options = {
     connKeepAliveIntervalMS: 10000
     ,dispatchMsgOnClientSend: false
-    ,destinationAuthorizeRouter: destAuthRouter
+    //,destinationAuthorizeRouter: destAuthRouter
 }
 
 let ret = tr.get('/', options);
