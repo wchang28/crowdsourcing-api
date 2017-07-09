@@ -24,7 +24,7 @@ var StateMachine = (function (_super) {
         _this._oldServer = null;
         _this._newServerLauncherTimer = null;
         _this._newServerLaunchCompletionCallback = null;
-        serverManager.on("instance-launched", function (Instance) {
+        serverManager.on("instance-launched", function (InstanceId) {
             if (_this.State === "initializing" || _this.State === "switching") {
                 if (_this._newServerLauncherTimer) {
                     clearTimeout(_this._newServerLauncherTimer);
@@ -42,7 +42,7 @@ var StateMachine = (function (_super) {
                     _this._newServer.State = "ready";
                     _this._currentServer = _this._newServer;
                     _this._newServer = null;
-                    _this.serverManager.terminateInstance(_this._oldServer.Instance);
+                    _this.serverManager.terminateInstance(_this._oldServer.Id);
                 }
                 if (typeof _this._newServerLaunchCompletionCallback === "function") {
                     _this._newServerLaunchCompletionCallback(null);
@@ -50,7 +50,7 @@ var StateMachine = (function (_super) {
                 }
                 _this.emit("change");
             }
-        }).on("instance-terminated", function (Instance) {
+        }).on("instance-terminated", function (InstanceId) {
             if (_this.State === "switched") {
                 _this._oldServer = null;
                 // back to "ready"
@@ -89,7 +89,7 @@ var StateMachine = (function (_super) {
             return Promise.reject({ error: "invalid-request", error_description: "not ready" });
         else {
             return this.serverManager.launchNewInstance().then(function (Instance) {
-                _this._newServer = { Instance: Instance, State: "initializing" };
+                _this._newServer = { Id: Instance.Id, InstanceUrl: Instance.InstanceUrl, State: "initializing" };
                 // "initializing" or "switching"
                 _this.emit("change");
                 _this._newServerLauncherTimer = setTimeout(function () {
@@ -128,8 +128,8 @@ var StateMachine = (function (_super) {
             });
         }
     };
-    Object.defineProperty(StateMachine.prototype, "ServerInstance", {
-        get: function () { return (this._currentServer ? this._currentServer.Instance : null); },
+    Object.defineProperty(StateMachine.prototype, "ServerInstanceUrl", {
+        get: function () { return (this._currentServer ? this._currentServer.InstanceUrl : null); },
         enumerable: true,
         configurable: true
     });
@@ -151,7 +151,7 @@ var StateMachine = (function (_super) {
     StateMachine.prototype.toJSON = function () {
         return {
             State: this.State,
-            ServerInstance: this.ServerInstance,
+            ServerInstanceUrl: this.ServerInstanceUrl,
             CurrentServer: this.CurrentServer,
             NewServer: this.NewServer,
             OldServer: this.OldServer

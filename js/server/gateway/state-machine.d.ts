@@ -1,19 +1,22 @@
 export declare type State = "uninitizlized" | "initializing" | "ready" | "switching" | "switched";
 export declare type ServerState = "initializing" | "ready" | "terminating";
-export declare type ServerInstance = string;
-export interface Server {
-    Instance: ServerInstance;
+export declare type ServerId = string;
+export interface ServerInstance {
+    Id: ServerId;
+    InstanceUrl: string;
+}
+export interface Server extends ServerInstance {
     State: ServerState;
 }
 export interface IServerManager {
     launchNewInstance(): Promise<ServerInstance>;
-    terminateInstance(Instance: ServerInstance): void;
-    on(event: "instance-launched", listener: (Instance: ServerInstance) => void): any;
-    on(event: "instance-terminated", listener: (Instance: ServerInstance) => void): any;
+    terminateInstance(InstanceId: ServerId): void;
+    on(event: "instance-launched", listener: (InstanceId: ServerId) => void): this;
+    on(event: "instance-terminated", listener: (InstanceId: ServerId) => void): this;
 }
 export interface StateMachineJSON {
     State: State;
-    ServerInstance: ServerInstance;
+    ServerInstanceUrl: string;
     CurrentServer: Server;
     NewServer: Server;
     OldServer: Server;
@@ -22,7 +25,7 @@ export interface IStateMachine {
     readonly State: State;
     initialize(): Promise<ServerInstance>;
     deploy(): Promise<any>;
-    readonly ServerInstance: ServerInstance;
+    readonly ServerInstanceUrl: string;
     readonly CurrentServer: Server;
     readonly NewServer: Server;
     readonly OldServer: Server;

@@ -4,23 +4,26 @@ export type State = "uninitizlized" | "initializing" | "ready" | "switching" | "
 
 export type ServerState = "initializing" | "ready" | "terminating";
 
-export type ServerInstance = string;
+export type ServerId = string;
+export interface ServerInstance {
+    Id: ServerId;
+    InstanceUrl: string;
+}
 
-export interface Server {
-    Instance: ServerInstance;
+export interface Server extends ServerInstance {
     State: ServerState;
 }
 
 export interface IServerManager {
     launchNewInstance() : Promise<ServerInstance>;
-    terminateInstance(Instance: ServerInstance) : void;
-    on(event: "instance-launched", listener: (Instance: ServerInstance) => void);
-    on(event: "instance-terminated", listener: (Instance: ServerInstance) => void);
+    terminateInstance(InstanceId: ServerId) : void;
+    on(event: "instance-launched", listener: (InstanceId: ServerId) => void) : this;
+    on(event: "instance-terminated", listener: (InstanceId: ServerId) => void): this;
 }
 
 export interface StateMachineJSON {
     State: State;
-    ServerInstance: ServerInstance;
+    ServerInstanceUrl: string;
     CurrentServer: Server;
     NewServer: Server;
     OldServer: Server;
@@ -30,7 +33,7 @@ export interface IStateMachine {
     readonly State: State;
     initialize() : Promise<ServerInstance>;
     deploy() : Promise<any>;
-    readonly ServerInstance : ServerInstance;
+    readonly ServerInstanceUrl : string;
     readonly CurrentServer : Server;
     readonly NewServer : Server;
     readonly OldServer : Server;
@@ -54,7 +57,7 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
         this._newServerLauncherTimer = null;
         this._newServerLaunchCompletionCallback = null;
 
-        serverManager.on("instance-launched", (Instance: ServerInstance) => {
+        serverManager.on("instance-launched", (InstanceId: ServerId) => {
             if (this.State === "initializing" || this.State === "switching") {
                 if (this._newServerLauncherTimer) {
                     clearTimeout(this._newServerLauncherTimer);
@@ -71,7 +74,7 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
                     this._newServer.State = "ready";
                     this._currentServer = this._newServer;
                     this._newServer = null;
-                    this.serverManager.terminateInstance(this._oldServer.Instance);
+                    this.serverManager.terminateInstance(this._oldServer.Id);
                 }
                 if (typeof this._newServerLaunchCompletionCallback === "function") {
                     this._newServerLaunchCompletionCallback(null);
@@ -79,7 +82,7 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
                 }
                 this.emit("change");
             }
-        }).on("instance-terminated", (Instance: ServerInstance) => {
+        }).on("instance-terminated", (InstanceId: ServerId) => {
             if (this.State === "switched") {
                 this._oldServer = null;
                 // back to "ready"
@@ -112,7 +115,7 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
             return Promise.reject({error: "invalid-request", error_description: "not ready"});
         else {
             return this.serverManager.launchNewInstance().then((Instance: ServerInstance) => {
-                this._newServer = {Instance, State: "initializing"};
+                this._newServer = {Id: Instance.Id, InstanceUrl: Instance.InstanceUrl, State: "initializing"};
                 // "initializing" or "switching"
                 this.emit("change");
                 this._newServerLauncherTimer = setTimeout(() => {
@@ -150,14 +153,14 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
             });
         }
     }
-    get ServerInstance() : ServerInstance {return (this._currentServer ? this._currentServer.Instance : null);}
+    get ServerInstanceUrl() : string {return (this._currentServer ? this._currentServer.InstanceUrl : null);}
     get CurrentServer() : Server {return this._currentServer;}
     get NewServer() : Server {return this._newServer;}
     get OldServer() : Server {return this._oldServer;}
     toJSON() : StateMachineJSON {
         return {
             State: this.State
-            ,ServerInstance: this.ServerInstance
+            ,ServerInstanceUrl: this.ServerInstanceUrl
             ,CurrentServer: this.CurrentServer
             ,NewServer: this.NewServer
             ,OldServer: this.OldServer

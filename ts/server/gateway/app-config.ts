@@ -5,4 +5,5 @@ export interface IAppConfig {
     adminServerConfig: IWebServerConfig;
     msgServerConfig: IWebServerConfig;
     proxyServerConfig: IWebServerConfig;
+    availableApiServerPorts: [number, number];
 }

@@ -6,6 +6,7 @@ import * as prettyPrinter from 'express-pretty-print';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IAppConfig} from './app-config';
+import {get as getServerManager, IServerMessenger} from "./server-mgr";
 import * as sm from "./state-machine";
 
 let configFile: string = null;
@@ -17,8 +18,22 @@ else
 
 let config: IAppConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 
+let appMsg = express();
+appMsg.set('jsonp callback name', 'cb');
+appMsg.use(noCache);
+appMsg.use(bodyParser.json({"limit":"999mb"}));
+appMsg.use(prettyPrinter.get());
+
+startServer(config.msgServerConfig, appMsg, (secure:boolean, host:string, port:number) => {
+    let protocol = (secure ? 'https' : 'http');
+    console.log(new Date().toISOString() + ': api gateway msg server listening at %s://%s:%s', protocol, host, port);
+}, (err:any) => {
+    console.error(new Date().toISOString() + ': !!! api gateway msg server error: ' + JSON.stringify(err));
+    process.exit(1);
+});
+
 /*
-let stateMachine = sm.get(null);
+let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, null));
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
     let appProxy = express();
 
@@ -37,20 +52,5 @@ startServer(config.adminServerConfig, appAdmin, (secure:boolean, host:string, po
     //stateMachine.initialize();
 }, (err:any) => {
     console.error(new Date().toISOString() + ': !!! api gateway admin server error: ' + JSON.stringify(err));
-    process.exit(1);
-});
-
-let appMsg = express();
-appMsg.set('jsonp callback name', 'cb');
-appMsg.use(noCache);
-appMsg.use(bodyParser.json({"limit":"999mb"}));
-appMsg.use(prettyPrinter.get());
-
-startServer(config.msgServerConfig, appMsg, (secure:boolean, host:string, port:number) => {
-    let protocol = (secure ? 'https' : 'http');
-    console.log(new Date().toISOString() + ': api gateway msg server listening at %s://%s:%s', protocol, host, port);
-    //stateMachine.initialize();
-}, (err:any) => {
-    console.error(new Date().toISOString() + ': !!! api gateway msg server error: ' + JSON.stringify(err));
     process.exit(1);
 });
