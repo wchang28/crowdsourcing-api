@@ -103,7 +103,7 @@ var StateMachine = (function (_super) {
             });
         }
     };
-    StateMachine.prototype.switch = function () {
+    StateMachine.prototype.deploy = function () {
         var _this = this;
         if (this.State !== "ready")
             return Promise.reject({ error: "invalid-request", error_description: "not ready" });
@@ -154,3 +154,5 @@ var StateMachine = (function (_super) {
     };
     return StateMachine;
 }(events.EventEmitter));
+function get(serverManager) { return new StateMachine(serverManager); }
+exports.get = get;

@@ -28,7 +28,7 @@ export interface StateMachineJSON {
 
 export interface IStateMachine {
     readonly State: State;
-    switch() : Promise<any>;
+    deploy() : Promise<any>;
     readonly ServerInstance : ServerInstance;
     readonly CurrentServer : Server;
     readonly NewServer : Server;
@@ -126,7 +126,7 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
             });
         }
     }
-    switch() : Promise<any> {
+    deploy() : Promise<any> {
         if (this.State !== "ready")
             return Promise.reject({error: "invalid-request", error_description: "not ready"});
         else {
@@ -159,3 +159,5 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
         };
     }
 }
+
+export function get(serverManager: IServerManager) : IStateMachine {return new StateMachine(serverManager);}

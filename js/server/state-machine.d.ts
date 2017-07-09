@@ -20,7 +20,7 @@ export interface StateMachineJSON {
 }
 export interface IStateMachine {
     readonly State: State;
-    switch(): Promise<any>;
+    deploy(): Promise<any>;
     readonly ServerInstance: ServerInstance;
     readonly CurrentServer: Server;
     readonly NewServer: Server;
@@ -30,3 +30,4 @@ export interface IStateMachine {
     on(event: "ready", listener: () => void): this;
     on(event: "error", listener: (err: any) => void): this;
 }
+export declare function get(serverManager: IServerManager): IStateMachine;
