@@ -23,7 +23,7 @@ export interface IServerManager {
 
 export interface StateMachineJSON {
     State: State;
-    ServerInstanceUrl: string;
+    TargetInstanceUrl: string;
     CurrentServer: Server;
     NewServer: Server;
     OldServer: Server;
@@ -33,7 +33,7 @@ export interface IStateMachine {
     readonly State: State;
     initialize() : Promise<ServerInstance>;
     deploy() : Promise<any>;
-    readonly ServerInstanceUrl : string;
+    readonly TargetInstanceUrl : string;
     readonly CurrentServer : Server;
     readonly NewServer : Server;
     readonly OldServer : Server;
@@ -153,14 +153,14 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
             });
         }
     }
-    get ServerInstanceUrl() : string {return (this._currentServer ? this._currentServer.InstanceUrl : null);}
+    get TargetInstanceUrl() : string {return (this._currentServer ? this._currentServer.InstanceUrl : null);}
     get CurrentServer() : Server {return this._currentServer;}
     get NewServer() : Server {return this._newServer;}
     get OldServer() : Server {return this._oldServer;}
     toJSON() : StateMachineJSON {
         return {
             State: this.State
-            ,ServerInstanceUrl: this.ServerInstanceUrl
+            ,TargetInstanceUrl: this.TargetInstanceUrl
             ,CurrentServer: this.CurrentServer
             ,NewServer: this.NewServer
             ,OldServer: this.OldServer

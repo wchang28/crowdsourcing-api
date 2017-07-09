@@ -22,6 +22,7 @@ var server_mgr_1 = require("./server-mgr");
 var sm = require("./state-machine");
 var msg_1 = require("./msg");
 var services_1 = require("./services");
+var proxy = require("express-http-proxy");
 var configFile = null;
 if (process.argv.length < 3)
     configFile = path.join(__dirname, "../../../configs/local-testing-config.json");
@@ -70,7 +71,22 @@ var ServerMessenger = (function (_super) {
 }(events.EventEmitter));
 var stateMachine = sm.get(server_mgr_1.get(config.availableApiServerPorts, new ServerMessenger(msg_1.ConnectionsManager)));
 stateMachine.on("ready", function () {
+    console.log(new Date().toISOString() + ': state machine reports a <ready> state. starting the api proxy server...');
     var appProxy = express();
+    var options = {
+        targetAcquisition: function (req) {
+            return Promise.resolve({ targetUrl: stateMachine.TargetInstanceUrl + "/services" });
+        }
+    };
+    appProxy.use("/services", proxy.get(options));
+    express_web_server_1.startServer(config.proxyServerConfig, appProxy, function (secure, host, port) {
+        var protocol = (secure ? 'https' : 'http');
+        console.log(new Date().toISOString() + ': api gateway proxy server listening at %s://%s:%s', protocol, host, port);
+        stateMachine.initialize();
+    }, function (err) {
+        console.error(new Date().toISOString() + ': !!! api gateway proxy server error: ' + JSON.stringify(err));
+        process.exit(1);
+    });
 }).on("change", function () {
     console.log(new Date().toISOString() + ": <<change>> state=" + stateMachine.State);
 }).on("error", function (err) {

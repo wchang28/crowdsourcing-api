@@ -14,6 +14,7 @@ import {Router as msgRouter, ConnectionsManager} from "./msg";
 import {Message, ServerId, ReadyContent} from "./message";
 import {IGlobal} from "./global";
 import {Router as servicesRouter} from "./services";
+import * as proxy from "express-http-proxy";
 
 let configFile: string = null;
 
@@ -66,8 +67,23 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
 
 let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, new ServerMessenger(ConnectionsManager)));
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
+    console.log(new Date().toISOString() + ': state machine reports a <ready> state. starting the api proxy server...');
     let appProxy = express();
+    let options: proxy.Options = {
+        targetAcquisition: (req: express.Request) => {
+            return Promise.resolve<proxy.TargetSettings>({targetUrl: stateMachine.TargetInstanceUrl + "/services"});
+        }
+    }
+    appProxy.use("/services", proxy.get(options));
 
+    startServer(config.proxyServerConfig, appProxy, (secure:boolean, host:string, port:number) => {
+        let protocol = (secure ? 'https' : 'http');
+        console.log(new Date().toISOString() + ': api gateway proxy server listening at %s://%s:%s', protocol, host, port);
+        stateMachine.initialize();
+    }, (err:any) => {
+        console.error(new Date().toISOString() + ': !!! api gateway proxy server error: ' + JSON.stringify(err));
+        process.exit(1);
+    });
 }).on("change", () => {
     console.log(new Date().toISOString() + ": <<change>> state=" + stateMachine.State);
 }).on("error", (err: any) => {

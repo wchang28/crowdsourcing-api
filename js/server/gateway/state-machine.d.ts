@@ -16,7 +16,7 @@ export interface IServerManager {
 }
 export interface StateMachineJSON {
     State: State;
-    ServerInstanceUrl: string;
+    TargetInstanceUrl: string;
     CurrentServer: Server;
     NewServer: Server;
     OldServer: Server;
@@ -25,7 +25,7 @@ export interface IStateMachine {
     readonly State: State;
     initialize(): Promise<ServerInstance>;
     deploy(): Promise<any>;
-    readonly ServerInstanceUrl: string;
+    readonly TargetInstanceUrl: string;
     readonly CurrentServer: Server;
     readonly NewServer: Server;
     readonly OldServer: Server;

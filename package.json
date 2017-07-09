@@ -19,10 +19,12 @@
     "@types/uuid": "^3.0.0",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
+    "express-http-proxy": "https://github.com/wchang28/express-http-proxy.git",
     "express-pretty-print": "git+https://github.com/wchang28/express-pretty-print.git",
     "express-web-server": "git+https://github.com/wchang28/express-web-server.git",
     "lodash": "^4.17.4",
     "no-cache-express": "git+https://github.com/wchang28/no-cache-express.git",
+    "rcf": "https://github.com/wchang28/rcf.git",
     "rcf-message-router": "https://github.com/wchang28/rcf-message-router.git",
     "uuid": "^3.1.0"
   }

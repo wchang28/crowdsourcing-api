@@ -128,7 +128,7 @@ var StateMachine = (function (_super) {
             });
         }
     };
-    Object.defineProperty(StateMachine.prototype, "ServerInstanceUrl", {
+    Object.defineProperty(StateMachine.prototype, "TargetInstanceUrl", {
         get: function () { return (this._currentServer ? this._currentServer.InstanceUrl : null); },
         enumerable: true,
         configurable: true
@@ -151,7 +151,7 @@ var StateMachine = (function (_super) {
     StateMachine.prototype.toJSON = function () {
         return {
             State: this.State,
-            ServerInstanceUrl: this.ServerInstanceUrl,
+            TargetInstanceUrl: this.TargetInstanceUrl,
             CurrentServer: this.CurrentServer,
             NewServer: this.NewServer,
             OldServer: this.OldServer
