@@ -17,11 +17,13 @@ else
 
 let config: IAppConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 
+/*
 let stateMachine = sm.get(null);
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
     let appProxy = express();
 
 });
+*/
 
 let appAdmin = express();
 appAdmin.set('jsonp callback name', 'cb');
@@ -47,7 +49,7 @@ appMsg.use(prettyPrinter.get());
 startServer(config.msgServerConfig, appMsg, (secure:boolean, host:string, port:number) => {
     let protocol = (secure ? 'https' : 'http');
     console.log(new Date().toISOString() + ': api gateway msg server listening at %s://%s:%s', protocol, host, port);
-    stateMachine.initialize();
+    //stateMachine.initialize();
 }, (err:any) => {
     console.error(new Date().toISOString() + ': !!! api gateway msg server error: ' + JSON.stringify(err));
     process.exit(1);
