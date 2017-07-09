@@ -9,6 +9,9 @@ var destAuthRouter = express.Router();
 destAuthRouter.post("/topic/gateway", tr.destAuth(function (req, res) {
     res.accept();
 }));
+destAuthRouter.get("/topic/:InstanceId", tr.destAuth(function (req, res) {
+    res.accept();
+}));
 var options = {
     connKeepAliveIntervalMS: 10000,
     dispatchMsgOnClientSend: false,

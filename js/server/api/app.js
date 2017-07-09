@@ -5,20 +5,35 @@ var express_web_server_1 = require("express-web-server");
 var bodyParser = require("body-parser");
 var noCache = require("no-cache-express");
 var prettyPrinter = require("express-pretty-print");
+var rcf = require("rcf");
+var node$ = require("rest-node");
 var InstanceId = process.argv[2];
 var Port = parseInt(process.argv[3]);
+var MsgPort = parseInt(process.argv[4]);
 console.log("InstanceId=" + InstanceId);
 console.log("Port=" + Port);
+console.log("MsgPort=" + MsgPort);
 var app = express();
 app.set('jsonp callback name', 'cb');
 app.use(noCache);
 app.use(bodyParser.text({ "limit": "999mb" }));
 app.use(bodyParser.json({ "limit": "999mb" }));
 app.use(prettyPrinter.get());
+var terminationPending = false;
 var count = 0;
+function flagTerminationPending() {
+    terminationPending = true;
+    if (count === 0)
+        process.exit(0);
+}
+function onUsageCountChanged() {
+    if (terminationPending && count === 0)
+        process.exit(0);
+}
 app.use(function (req, res, next) {
     count++;
     console.log("\n<<count++>> count=" + count.toString());
+    onUsageCountChanged();
     req.on("end", function () {
         console.log("req => <<end>>");
         count--;
@@ -34,6 +49,7 @@ app.use(function (req, res, next) {
         console.log("res => <<close>>");
         count--;
         console.log("<<count-->> count=" + count.toString());
+        onUsageCountChanged();
     }).on("error", function (err) {
         console.log("res => <<error>>, err=" + JSON.stringify(err));
     });
@@ -64,12 +80,33 @@ app.get("/hi", function (req, res) {
         res.jsonp({ msg: "How are you?" });
     }, 10000);
 });
-//app.set("global", g);
 //app.use('/services', servicesRouter);
-express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, app, function (secure, host, port) {
-    var protocol = (secure ? 'https' : 'http');
-    console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-}, function (err) {
-    console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
-    process.exit(1);
+var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
+var msgClient = api.$M("/msg/events", { reconnetIntervalMS: 3000 });
+msgClient.on("connect", function (conn_id) {
+    msgClient.subscribe("/topic/" + InstanceId, function (msg) {
+        if (msg.body) {
+            var message = msg.body;
+            if (message.type = "terminate") {
+                flagTerminationPending();
+            }
+        }
+    }).then(function (sub_id) {
+        console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
+        console.log(new Date().toISOString() + ": starting the web server");
+        express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, app, function (secure, host, port) {
+            var protocol = (secure ? 'https' : 'http');
+            console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
+            var content = { InstanceId: InstanceId };
+            var msg = { type: "ready", content: content };
+            msgClient.send("/topic/gateway", {}, msg);
+        }, function (err) {
+            console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
+            process.exit(1);
+        });
+    }).catch(function (err) {
+        console.error(new Date().toISOString() + ': !!! Error subscribing to topic: ' + JSON.stringify(err));
+    });
+}).on("error", function (err) {
+    console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));
 });

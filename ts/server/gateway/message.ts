@@ -8,5 +8,5 @@ export interface ReadyContent {
 
 export interface Message {
     type: MsgType;
-    contnet?: any;
+    content?: any;
 }

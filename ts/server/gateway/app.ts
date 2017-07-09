@@ -48,7 +48,7 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
             if (params.destination === '/topic/gateway') {
                 let msg:Message = params.body;
                 if (msg.type === "ready") {
-                    let content: ReadyContent = msg.contnet;
+                    let content: ReadyContent = msg.content;
                     let InstanceId = content.InstanceId;
                     connection.cookie = InstanceId;
                     this.emit("instance-launched", InstanceId);
@@ -65,7 +65,7 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
     }
 }
 
-let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, new ServerMessenger(ConnectionsManager)));
+let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, new ServerMessenger(ConnectionsManager), config.msgServerConfig.http.port));
 
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
     console.log(new Date().toISOString() + ': state machine reports a <ready> state. starting the api proxy server...');

@@ -3,12 +3,17 @@ import {IWebServerConfig, startServer} from 'express-web-server';
 import * as bodyParser from "body-parser";
 import noCache = require('no-cache-express');
 import * as prettyPrinter from 'express-pretty-print';
+import * as rcf from "rcf";
+import * as node$ from "rest-node";
+import {Message, ReadyContent} from "../gateway/message";
 
 let InstanceId = process.argv[2];
 let Port = parseInt(process.argv[3]);
+let MsgPort = parseInt(process.argv[4]);
 
 console.log("InstanceId=" + InstanceId);
 console.log("Port=" + Port);
+console.log("MsgPort=" + MsgPort);
 
 let app = express();
 
@@ -19,11 +24,24 @@ app.use(bodyParser.text({"limit":"999mb"}));
 app.use(bodyParser.json({"limit":"999mb"}));
 app.use(prettyPrinter.get());
 
+let terminationPending = false;
 let count = 0;
+
+function flagTerminationPending() {
+    terminationPending = true;
+    if (count === 0)
+        process.exit(0);
+}
+
+function onUsageCountChanged() {
+    if (terminationPending && count === 0)
+        process.exit(0);
+}
 
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
     count++;
     console.log("\n<<count++>> count=" + count.toString());
+    onUsageCountChanged();
     req.on("end", () => {
         console.log("req => <<end>>");
         count--;
@@ -40,6 +58,7 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
         console.log("res => <<close>>");
         count--;
         console.log("<<count-->> count=" + count.toString());
+        onUsageCountChanged();
     }).on("error", (err: any) => {
         console.log("res => <<error>>, err=" + JSON.stringify(err));
     });
@@ -77,14 +96,35 @@ app.get("/hi", (req: express.Request, res: express.Response) => {
     }, 10000);
 });
 
-//app.set("global", g);
-
 //app.use('/services', servicesRouter);
 
-startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
-    let protocol = (secure ? 'https' : 'http');
-    console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-}, (err:any) => {
-    console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
-    process.exit(1);
+let api = new rcf.AuthorizedRestApi(node$.get(), {instance_url: "http://127.0.0.1:" + MsgPort.toString()});
+let msgClient = api.$M("/msg/events", {reconnetIntervalMS: 3000});
+msgClient.on("connect", (conn_id: string) => {
+    msgClient.subscribe("/topic/" + InstanceId, (msg: rcf.IMessage) => {
+        if (msg.body) {
+            let message : Message = msg.body;
+            if (message.type = "terminate") {
+                flagTerminationPending();
+            }
+        }
+    }).then((sub_id: string) => {
+        console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
+        console.log(new Date().toISOString() + ": starting the web server");
+        startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
+            let protocol = (secure ? 'https' : 'http');
+            console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
+            let content: ReadyContent = {InstanceId};
+            let msg: Message = {type: "ready", content};
+            msgClient.send("/topic/gateway", {}, msg);
+        }, (err:any) => {
+            console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
+            process.exit(1);
+        });
+    }).catch((err: any) => {
+        console.error(new Date().toISOString() + ': !!! Error subscribing to topic: ' + JSON.stringify(err));
+    });
+}).on("error", (err: any) => {
+    console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));
 });
+

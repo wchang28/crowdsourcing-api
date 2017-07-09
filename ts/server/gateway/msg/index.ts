@@ -11,6 +11,10 @@ destAuthRouter.post("/topic/gateway", tr.destAuth((req: tr.DestAuthRequest, res:
     res.accept();
 }));
 
+destAuthRouter.get("/topic/:InstanceId", tr.destAuth((req: tr.DestAuthRequest, res: tr.DestAuthResponse) => {
+    res.accept();
+}));
+
 let options: tr.Options = {
     connKeepAliveIntervalMS: 10000
     ,dispatchMsgOnClientSend: false

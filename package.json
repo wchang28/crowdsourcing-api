@@ -26,6 +26,7 @@
     "no-cache-express": "git+https://github.com/wchang28/no-cache-express.git",
     "rcf": "https://github.com/wchang28/rcf.git",
     "rcf-message-router": "https://github.com/wchang28/rcf-message-router.git",
+    "rest-node": "https://github.com/wchang28/rest-node.git",
     "uuid": "^3.1.0"
   }
 }

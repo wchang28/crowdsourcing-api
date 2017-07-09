@@ -18,7 +18,7 @@ interface PortItem {
 
 class ServerManager extends events.EventEmitter implements sm.IServerManager {
     private _ports: [PortItem, PortItem];
-    constructor(availablePorts: [number, number], private serverMessenger: IServerMessenger) {
+    constructor(availablePorts: [number, number], private serverMessenger: IServerMessenger, private msgPort: number) {
         super();
         this._ports = [{Port:availablePorts[0], InstanceId: null}, {Port:availablePorts[1], InstanceId: null}];
         this.serverMessenger.on("instance-launched", (InstanceId: ServerId) => {
@@ -40,7 +40,7 @@ class ServerManager extends events.EventEmitter implements sm.IServerManager {
     }
     private launchInstance(InstanceId: ServerId, Port: number) : Promise<any> {
         let apiAppScript = path.join(__dirname, "../api/app.js");
-        cp.spawn("node.exe", [apiAppScript, InstanceId, Port.toString()]);
+        cp.spawn("node.exe", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()]);
         return Promise.resolve<any>(null);
     }
     launchNewInstance() : Promise<sm.ServerInstance> {
@@ -53,4 +53,4 @@ class ServerManager extends events.EventEmitter implements sm.IServerManager {
     terminateInstance(InstanceId: string) : void {this.serverMessenger.notifyToTerminate(InstanceId);}
 }
 
-export function get(availablePorts: [number, number], serverMessenger: IServerMessenger) : sm.IServerManager {return new ServerManager(availablePorts, serverMessenger);}
+export function get(availablePorts: [number, number], serverMessenger: IServerMessenger, msgPort: number) : sm.IServerManager {return new ServerManager(availablePorts, serverMessenger, msgPort);}
