@@ -5,6 +5,10 @@ var express_web_server_1 = require("express-web-server");
 var bodyParser = require("body-parser");
 var noCache = require("no-cache-express");
 var prettyPrinter = require("express-pretty-print");
+var InstanceId = process.argv[2];
+var Port = parseInt(process.argv[3]);
+console.log("InstanceId=" + InstanceId);
+console.log("Port=" + Port);
 var app = express();
 app.set('jsonp callback name', 'cb');
 app.use(noCache);
@@ -51,12 +55,10 @@ app.options("/*", function (req, res) {
 });
 //console.log("env=\n" + JSON.stringify(process.env, null, 2) + "\n");
 console.log("NODE_PATH=" + process.env["NODE_PATH"]);
-var uuid = require("uuid");
+/*
+const uuid = require("uuid");
 console.log(uuid.v4());
-var mod_id = require.resolve("uuid");
-console.log("mod_id=" + mod_id);
-var mod = (require.cache[mod_id]);
-console.log(mod.filename);
+*/
 app.get("/hi", function (req, res) {
     setTimeout(function () {
         res.jsonp({ msg: "How are you?" });
@@ -64,7 +66,7 @@ app.get("/hi", function (req, res) {
 });
 //app.set("global", g);
 //app.use('/services', servicesRouter);
-express_web_server_1.startServer({ http: { port: 8745, host: "127.0.0.1" } }, app, function (secure, host, port) {
+express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, app, function (secure, host, port) {
     var protocol = (secure ? 'https' : 'http');
     console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
 }, function (err) {

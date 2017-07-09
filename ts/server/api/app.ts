@@ -4,6 +4,12 @@ import * as bodyParser from "body-parser";
 import noCache = require('no-cache-express');
 import * as prettyPrinter from 'express-pretty-print';
 
+let InstanceId = process.argv[2];
+let Port = parseInt(process.argv[3]);
+
+console.log("InstanceId=" + InstanceId);
+console.log("Port=" + Port);
+
 let app = express();
 
 app.set('jsonp callback name', 'cb');
@@ -60,13 +66,10 @@ app.options("/*", (req: express.Request, res: express.Response) => {
 //console.log("env=\n" + JSON.stringify(process.env, null, 2) + "\n");
 console.log("NODE_PATH=" + process.env["NODE_PATH"]);
 
+/*
 const uuid = require("uuid");
 console.log(uuid.v4());
-
-let mod_id =require.resolve("uuid");
-console.log("mod_id=" + mod_id);
-let mod = <NodeModule>(require.cache[mod_id]);
-console.log(mod.filename);
+*/
 
 app.get("/hi", (req: express.Request, res: express.Response) => {
     setTimeout(() => {
@@ -78,7 +81,7 @@ app.get("/hi", (req: express.Request, res: express.Response) => {
 
 //app.use('/services', servicesRouter);
 
-startServer({http:{port: 8745, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
+startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
     let protocol = (secure ? 'https' : 'http');
     console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
 }, (err:any) => {

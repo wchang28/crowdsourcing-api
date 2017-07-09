@@ -6,6 +6,7 @@ import * as prettyPrinter from 'express-pretty-print';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IAppConfig} from './app-config';
+import * as events from "events";
 import {get as getServerManager, IServerMessenger} from "./server-mgr";
 import * as sm from "./state-machine";
 
@@ -33,12 +34,24 @@ startServer(config.msgServerConfig, appMsg, (secure:boolean, host:string, port:n
 });
 
 /*
-let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, null));
+    notifyToTerminate(InstanceId: string): void;
+    on(event: "instance-launched", listener: (InstanceId: sm.ServerId) => void) : this;
+    on(event: "instance-terminated", listener: (InstanceId: sm.ServerId) => void): this;
+*/
+class ServerMessenger extends events.EventEmitter implements IServerMessenger {
+    constructor() {
+        super();
+    }
+    notifyToTerminate(InstanceId: string): void {
+
+    }
+}
+
+let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, new ServerMessenger()));
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
     let appProxy = express();
 
 });
-*/
 
 let appAdmin = express();
 appAdmin.set('jsonp callback name', 'cb');
@@ -49,7 +62,7 @@ appAdmin.use(prettyPrinter.get());
 startServer(config.adminServerConfig, appAdmin, (secure:boolean, host:string, port:number) => {
     let protocol = (secure ? 'https' : 'http');
     console.log(new Date().toISOString() + ': api gateway admin server listening at %s://%s:%s', protocol, host, port);
-    //stateMachine.initialize();
+    stateMachine.initialize();
 }, (err:any) => {
     console.error(new Date().toISOString() + ': !!! api gateway admin server error: ' + JSON.stringify(err));
     process.exit(1);
