@@ -72,8 +72,9 @@ var stateMachine = sm.get(server_mgr_1.get(config.availableApiServerPorts, new S
 stateMachine.on("ready", function () {
     var appProxy = express();
 }).on("change", function () {
-    console.log("<<chgange>> state=" + stateMachine.State);
+    console.log(new Date().toISOString() + ": <<change>> state=" + stateMachine.State);
 }).on("error", function (err) {
+    console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));
 });
 var appAdmin = express();
 appAdmin.set('jsonp callback name', 'cb');

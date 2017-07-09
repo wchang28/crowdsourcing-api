@@ -69,9 +69,9 @@ stateMachine.on("ready", () => {    // api server is ready => get the proxy read
     let appProxy = express();
 
 }).on("change", () => {
-    console.log("<<chgange>> state=" + stateMachine.State);
+    console.log(new Date().toISOString() + ": <<change>> state=" + stateMachine.State);
 }).on("error", (err: any) => {
-
+    console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));
 });
 
 let appAdmin = express();
