@@ -12,6 +12,8 @@ import * as sm from "./state-machine";
 import * as tr from 'rcf-message-router';
 import {Router as msgRouter, ConnectionsManager} from "./msg";
 import {Message, ServerId, ReadyContent} from "./message";
+import {IGlobal} from "./global";
+import {Router as servicesRouter} from "./services";
 
 let configFile: string = null;
 
@@ -66,6 +68,10 @@ let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, new S
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
     let appProxy = express();
 
+}).on("change", () => {
+    console.log("<<chgange>> state=" + stateMachine.State);
+}).on("error", (err: any) => {
+
 });
 
 let appAdmin = express();
@@ -73,6 +79,14 @@ appAdmin.set('jsonp callback name', 'cb');
 appAdmin.use(noCache);
 appAdmin.use(bodyParser.json({"limit":"999mb"}));
 appAdmin.use(prettyPrinter.get());
+
+let g: IGlobal = {
+    stateMachine
+};
+
+appAdmin.set("global", g);
+
+appAdmin.use("/services", servicesRouter);
 
 startServer(config.adminServerConfig, appAdmin, (secure:boolean, host:string, port:number) => {
     let protocol = (secure ? 'https' : 'http');

@@ -21,6 +21,7 @@ var events = require("events");
 var server_mgr_1 = require("./server-mgr");
 var sm = require("./state-machine");
 var msg_1 = require("./msg");
+var services_1 = require("./services");
 var configFile = null;
 if (process.argv.length < 3)
     configFile = path.join(__dirname, "../../../configs/local-testing-config.json");
@@ -70,12 +71,20 @@ var ServerMessenger = (function (_super) {
 var stateMachine = sm.get(server_mgr_1.get(config.availableApiServerPorts, new ServerMessenger(msg_1.ConnectionsManager)));
 stateMachine.on("ready", function () {
     var appProxy = express();
+}).on("change", function () {
+    console.log("<<chgange>> state=" + stateMachine.State);
+}).on("error", function (err) {
 });
 var appAdmin = express();
 appAdmin.set('jsonp callback name', 'cb');
 appAdmin.use(noCache);
 appAdmin.use(bodyParser.json({ "limit": "999mb" }));
 appAdmin.use(prettyPrinter.get());
+var g = {
+    stateMachine: stateMachine
+};
+appAdmin.set("global", g);
+appAdmin.use("/services", services_1.Router);
 express_web_server_1.startServer(config.adminServerConfig, appAdmin, function (secure, host, port) {
     var protocol = (secure ? 'https' : 'http');
     console.log(new Date().toISOString() + ': api gateway admin server listening at %s://%s:%s', protocol, host, port);
