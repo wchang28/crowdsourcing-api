@@ -41,7 +41,8 @@ var ServerManager = (function (_super) {
     };
     ServerManager.prototype.launchInstance = function (InstanceId, Port) {
         var apiAppScript = path.join(__dirname, "../api/app.js");
-        cp.spawn("node.exe", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()]);
+        cp.spawn("node.exe", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], { env: { "NODE_PATH": "C:\\test\\node_modules" } });
+        //cp.spawn("node.exe", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()]);
         return Promise.resolve(null);
     };
     ServerManager.prototype.launchNewInstance = function () {

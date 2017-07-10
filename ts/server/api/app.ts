@@ -114,7 +114,8 @@ msgClient.on("connect", (conn_id: string) => {
         startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
             let protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-            let content: ReadyContent = {InstanceId};
+            let NODE_PATH = process.env["NODE_PATH"];
+            let content: ReadyContent = {InstanceId, NODE_PATH};
             let msg: Message = {type: "ready", content};
             msgClient.send("/topic/gateway", {}, msg);
         }, (err:any) => {

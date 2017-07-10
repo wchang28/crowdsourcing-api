@@ -97,7 +97,8 @@ msgClient.on("connect", function (conn_id) {
         express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, app, function (secure, host, port) {
             var protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-            var content = { InstanceId: InstanceId };
+            var NODE_PATH = process.env["NODE_PATH"];
+            var content = { InstanceId: InstanceId, NODE_PATH: NODE_PATH };
             var msg = { type: "ready", content: content };
             msgClient.send("/topic/gateway", {}, msg);
         }, function (err) {
