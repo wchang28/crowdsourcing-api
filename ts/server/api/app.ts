@@ -96,24 +96,27 @@ let extensionModules = getAllExtensionModules(NODE_PATH);
 for (let i in extensionModules) {   // for each module
     let module = extensionModules[i].module;
     try {
-        let modExport: ExtensionModuleExport = require(module);
-        for (let j in modExport) {  // for each item
-            let exportItem = modExport[j];
-            let method = exportItem.method;
-            let methodFunc = getExpressMethodFunctionBindedToApp(method);
-            methodFunc("/services" + exportItem.pathname, exportItem.requestHandlers);
+        let moduleExport: ExtensionModuleExport = require(module);
+        for (let j in moduleExport) {  // for each item
+            let exportItem = moduleExport[j];
+            if (exportItem && exportItem.method && exportItem.pathname && exportItem.requestHandlers && exportItem.requestHandlers.length > 0) {
+                let methodFunc = getExpressMethodFunctionBindedToApp(exportItem.method);
+                let apiPath = "/services" + exportItem.pathname;
+                if (apiPath.substr(apiPath.length - 1, 1) === "/") apiPath = apiPath.substr(0, apiPath.length - 1);
+                methodFunc(apiPath, exportItem.requestHandlers);
+            }
         }
     } catch(e) {
 
     }
 }
 
+/*
 app.get("/services/hi", (req: express.Request, res: express.Response) => {
     res.jsonp({msg: "How are you sir?"});
     //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);
 });
-
-//app.use('/services', servicesRouter);
+*/
 
 let api = new rcf.AuthorizedRestApi(node$.get(), {instance_url: "http://127.0.0.1:" + MsgPort.toString()});
 let msgClient = api.$M("/msg/events/event_stream", {reconnetIntervalMS: 3000});
