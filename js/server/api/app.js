@@ -78,11 +78,7 @@ console.log(uuid.v4());
 */
 app.get("/services/hi", function (req, res) {
     res.jsonp({ msg: "How are you sir?" });
-    /*
-    setTimeout(() => {
-        res.jsonp({msg: "How are you?"});
-    }, 30000);
-    */
+    //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);
 });
 //app.use('/services', servicesRouter);
 var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });

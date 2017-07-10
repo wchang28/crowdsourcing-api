@@ -93,11 +93,7 @@ console.log(uuid.v4());
 
 app.get("/services/hi", (req: express.Request, res: express.Response) => {
     res.jsonp({msg: "How are you sir?"});
-    /*
-    setTimeout(() => {
-        res.jsonp({msg: "How are you?"});
-    }, 30000);
-    */
+    //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);
 });
 
 //app.use('/services', servicesRouter);
