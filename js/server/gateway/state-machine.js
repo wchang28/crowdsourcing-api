@@ -120,7 +120,7 @@ var StateMachine = (function (_super) {
                         if (err)
                             reject(err);
                         else
-                            resolve({});
+                            resolve({ deployed: true });
                     };
                 }).catch(function (err) {
                     reject(err);

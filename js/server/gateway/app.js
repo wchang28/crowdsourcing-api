@@ -54,7 +54,7 @@ var ServerMessenger = (function (_super) {
                     var content = msg.content;
                     var InstanceId = content.InstanceId;
                     if (content.NODE_PATH)
-                        console.log(new Date().toISOString() + ": server reported NODE_PATH=" + content.NODE_PATH);
+                        console.log(new Date().toISOString() + ": new server reported NODE_PATH=" + content.NODE_PATH);
                     else
                         console.error(new Date().toISOString() + "!!! Error: server did not receive NODE_PATH env. variable");
                     connection.cookie = InstanceId;

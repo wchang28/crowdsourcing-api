@@ -51,7 +51,7 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
                     let content: ReadyContent = msg.content;
                     let InstanceId = content.InstanceId;
                     if (content.NODE_PATH)
-                        console.log(new Date().toISOString() + ": server reported NODE_PATH=" + content.NODE_PATH);
+                        console.log(new Date().toISOString() + ": new server reported NODE_PATH=" + content.NODE_PATH);
                     else
                         console.error(new Date().toISOString() + "!!! Error: server did not receive NODE_PATH env. variable");
                     connection.cookie = InstanceId;

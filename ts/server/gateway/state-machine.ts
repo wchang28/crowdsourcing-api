@@ -145,7 +145,7 @@ class StateMachine extends events.EventEmitter implements IStateMachine {
                         if (err)
                             reject(err);
                         else
-                            resolve({});
+                            resolve({deployed: true});
                     };
                 }).catch((err: any) => {
                     reject(err);
