@@ -99,7 +99,7 @@ app.get("/hi", (req: express.Request, res: express.Response) => {
 //app.use('/services', servicesRouter);
 
 let api = new rcf.AuthorizedRestApi(node$.get(), {instance_url: "http://127.0.0.1:" + MsgPort.toString()});
-let msgClient = api.$M("/msg/events", {reconnetIntervalMS: 3000});
+let msgClient = api.$M("/msg/events/event_stream", {reconnetIntervalMS: 3000});
 msgClient.on("connect", (conn_id: string) => {
     msgClient.subscribe("/topic/" + InstanceId, (msg: rcf.IMessage) => {
         if (msg.body) {
@@ -123,6 +123,7 @@ msgClient.on("connect", (conn_id: string) => {
         });
     }).catch((err: any) => {
         console.error(new Date().toISOString() + ': !!! Error subscribing to topic: ' + JSON.stringify(err));
+        process.exit(1);
     });
 }).on("error", (err: any) => {
     console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));

@@ -6,19 +6,22 @@ var tr = require("rcf-message-router");
 var router = express.Router();
 exports.Router = router;
 var destAuthRouter = express.Router();
-destAuthRouter.post("/topic/gateway", tr.destAuth(function (req, res) {
+/*
+destAuthRouter.post("/topic/gateway", tr.destAuth((req: tr.DestAuthRequest, res: tr.DestAuthResponse) => {
     res.accept();
 }));
-destAuthRouter.get("/topic/:InstanceId", tr.destAuth(function (req, res) {
+
+destAuthRouter.get("/topic/:InstanceId", tr.destAuth((req: tr.DestAuthRequest, res: tr.DestAuthResponse) => {
     res.accept();
 }));
+*/
 var options = {
     connKeepAliveIntervalMS: 10000,
     dispatchMsgOnClientSend: false
     //,destinationAuthorizeRouter: destAuthRouter
 };
-var ret = tr.get('/', options);
-router.use('/events', ret.router); // topic subscription endpoint is available at /events from this route
+var ret = tr.get('/event_stream', options);
+router.use('/events', ret.router); // topic subscription endpoint is available at /events/event_stream from this route
 var connectionsManager = ret.connectionsManager;
 exports.ConnectionsManager = connectionsManager;
 connectionsManager.on('client_connect', function (req, connection) {

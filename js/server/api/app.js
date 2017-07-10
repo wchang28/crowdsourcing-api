@@ -82,7 +82,7 @@ app.get("/hi", function (req, res) {
 });
 //app.use('/services', servicesRouter);
 var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
-var msgClient = api.$M("/msg/events", { reconnetIntervalMS: 3000 });
+var msgClient = api.$M("/msg/events/event_stream", { reconnetIntervalMS: 3000 });
 msgClient.on("connect", function (conn_id) {
     msgClient.subscribe("/topic/" + InstanceId, function (msg) {
         if (msg.body) {
@@ -106,6 +106,7 @@ msgClient.on("connect", function (conn_id) {
         });
     }).catch(function (err) {
         console.error(new Date().toISOString() + ': !!! Error subscribing to topic: ' + JSON.stringify(err));
+        process.exit(1);
     });
 }).on("error", function (err) {
     console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));
