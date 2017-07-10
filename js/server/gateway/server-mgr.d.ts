@@ -1,5 +1,5 @@
 import * as sm from "./state-machine";
-import { ServerId } from "./message";
+import { ServerId } from "../message";
 export interface IServerMessenger {
     notifyToTerminate(InstanceId: string): void;
     on(event: "instance-launched", listener: (InstanceId: ServerId) => void): this;

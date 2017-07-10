@@ -1,4 +1,4 @@
-import {ServerId} from "./message";
+import {ServerId} from "../message";
 import * as events from "events";
 
 export type State = "uninitizlized" | "initializing" | "ready" | "switching" | "switched";

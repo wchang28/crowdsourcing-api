@@ -11,7 +11,7 @@ import {get as getServerManager, IServerMessenger} from "./server-mgr";
 import * as sm from "./state-machine";
 import * as tr from 'rcf-message-router';
 import {Router as msgRouter, ConnectionsManager} from "./msg";
-import {Message, ServerId, ReadyContent} from "./message";
+import {Message, ServerId, ReadyContent} from "../message";
 import {IGlobal} from "./global";
 import {Router as servicesRouter} from "./services";
 import * as proxy from "express-http-proxy";

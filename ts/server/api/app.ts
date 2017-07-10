@@ -5,7 +5,9 @@ import noCache = require('no-cache-express');
 import * as prettyPrinter from 'express-pretty-print';
 import * as rcf from "rcf";
 import * as node$ from "rest-node";
-import {Message, ReadyContent} from "../gateway/message";
+import {Message, ReadyContent} from "../message";
+import {getAllExtensionModules} from "./extensions";
+import {ExtensionModuleExport} from "../../index";
 
 let InstanceId = process.argv[2];
 let Port = parseInt(process.argv[3]);
@@ -85,10 +87,26 @@ app.options("/*", (req: express.Request, res: express.Response) => {
     res.send(200);
 });
 
-/*
-const uuid = require("uuid");
-console.log(uuid.v4());
-*/
+function getExpressMethodFunctionBindedToApp(method: string) : (path: any, handlers: express.RequestHandler[]) => any {
+    let methodFunction: Function = app[method.toLowerCase()];
+    return methodFunction.bind(app);
+}
+
+let extensionModules = getAllExtensionModules(NODE_PATH);
+for (let i in extensionModules) {   // for each module
+    let module = extensionModules[i].module;
+    try {
+        let modExport: ExtensionModuleExport = require(module);
+        for (let j in modExport) {  // for each item
+            let exportItem = modExport[j];
+            let method = exportItem.method;
+            let methodFunc = getExpressMethodFunctionBindedToApp(method);
+            methodFunc("/services" + exportItem.pathname, exportItem.requestHandlers);
+        }
+    } catch(e) {
+
+    }
+}
 
 app.get("/services/hi", (req: express.Request, res: express.Response) => {
     res.jsonp({msg: "How are you sir?"});

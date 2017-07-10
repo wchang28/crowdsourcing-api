@@ -7,6 +7,7 @@ var noCache = require("no-cache-express");
 var prettyPrinter = require("express-pretty-print");
 var rcf = require("rcf");
 var node$ = require("rest-node");
+var extensions_1 = require("./extensions");
 var InstanceId = process.argv[2];
 var Port = parseInt(process.argv[3]);
 var MsgPort = parseInt(process.argv[4]);
@@ -72,10 +73,25 @@ app.options("/*", function (req, res) {
     res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Content-Length,X-Requested-With');
     res.send(200);
 });
-/*
-const uuid = require("uuid");
-console.log(uuid.v4());
-*/
+function getExpressMethodFunctionBindedToApp(method) {
+    var methodFunction = app[method.toLowerCase()];
+    return methodFunction.bind(app);
+}
+var extensionModules = extensions_1.getAllExtensionModules(NODE_PATH);
+for (var i in extensionModules) {
+    var module_1 = extensionModules[i].module;
+    try {
+        var modExport = require(module_1);
+        for (var j in modExport) {
+            var exportItem = modExport[j];
+            var method = exportItem.method;
+            var methodFunc = getExpressMethodFunctionBindedToApp(method);
+            methodFunc("/services" + exportItem.pathname, exportItem.requestHandlers);
+        }
+    }
+    catch (e) {
+    }
+}
 app.get("/services/hi", function (req, res) {
     res.jsonp({ msg: "How are you sir?" });
     //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);

@@ -3,7 +3,7 @@ import * as sm from "./state-machine";
 import * as uuid from "uuid";
 import * as cp from "child_process"; 
 import * as path from 'path';
-import {ServerId} from "./message";
+import {ServerId} from "../message";
 
 export interface IServerMessenger {
     notifyToTerminate(InstanceId: string): void;

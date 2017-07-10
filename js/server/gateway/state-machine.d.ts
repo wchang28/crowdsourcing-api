@@ -1,4 +1,4 @@
-import { ServerId } from "./message";
+import { ServerId } from "../message";
 export declare type State = "uninitizlized" | "initializing" | "ready" | "switching" | "switched";
 export declare type ServerState = "initializing" | "ready" | "terminating";
 export interface ServerInstance {
