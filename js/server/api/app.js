@@ -75,10 +75,13 @@ console.log("NODE_PATH=" + process.env["NODE_PATH"]);
 const uuid = require("uuid");
 console.log(uuid.v4());
 */
-app.get("/hi", function (req, res) {
-    setTimeout(function () {
-        res.jsonp({ msg: "How are you?" });
+app.get("/services/hi", function (req, res) {
+    res.jsonp({ msg: "How are you sir?" });
+    /*
+    setTimeout(() => {
+        res.jsonp({msg: "How are you?"});
     }, 10000);
+    */
 });
 //app.use('/services', servicesRouter);
 var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });

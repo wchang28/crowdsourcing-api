@@ -90,10 +90,13 @@ const uuid = require("uuid");
 console.log(uuid.v4());
 */
 
-app.get("/hi", (req: express.Request, res: express.Response) => {
+app.get("/services/hi", (req: express.Request, res: express.Response) => {
+    res.jsonp({msg: "How are you sir?"});
+    /*
     setTimeout(() => {
         res.jsonp({msg: "How are you?"});
     }, 10000);
+    */
 });
 
 //app.use('/services', servicesRouter);
