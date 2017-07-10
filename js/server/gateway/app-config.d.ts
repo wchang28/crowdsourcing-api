@@ -4,4 +4,5 @@ export interface IAppConfig {
     msgServerConfig: IWebServerConfig;
     proxyServerConfig: IWebServerConfig;
     availableApiServerPorts: [number, number];
+    NODE_PATH: string;
 }

@@ -73,7 +73,8 @@ var ServerMessenger = (function (_super) {
     };
     return ServerMessenger;
 }(events.EventEmitter));
-var stateMachine = sm.get(server_mgr_1.get(config.availableApiServerPorts, new ServerMessenger(msg_1.ConnectionsManager), config.msgServerConfig.http.port));
+var serverManager = server_mgr_1.get(config.availableApiServerPorts, config.msgServerConfig.http.port, config.NODE_PATH, new ServerMessenger(msg_1.ConnectionsManager));
+var stateMachine = sm.get(serverManager);
 stateMachine.on("ready", function () {
     console.log(new Date().toISOString() + ': state machine reports a <ready> state. starting the api proxy server...');
     var appProxy = express();

@@ -5,4 +5,4 @@ export interface IServerMessenger {
     on(event: "instance-launched", listener: (InstanceId: ServerId) => void): this;
     on(event: "instance-terminated", listener: (InstanceId: ServerId) => void): this;
 }
-export declare function get(availablePorts: [number, number], serverMessenger: IServerMessenger, msgPort: number): sm.IServerManager;
+export declare function get(availablePorts: [number, number], msgPort: number, NODE_PATH: string, serverMessenger: IServerMessenger): sm.IServerManager;

@@ -16,10 +16,11 @@ var cp = require("child_process");
 var path = require("path");
 var ServerManager = (function (_super) {
     __extends(ServerManager, _super);
-    function ServerManager(availablePorts, serverMessenger, msgPort) {
+    function ServerManager(availablePorts, msgPort, NODE_PATH, serverMessenger) {
         var _this = _super.call(this) || this;
-        _this.serverMessenger = serverMessenger;
         _this.msgPort = msgPort;
+        _this.NODE_PATH = NODE_PATH;
+        _this.serverMessenger = serverMessenger;
         _this._ports = [{ Port: availablePorts[0], InstanceId: null }, { Port: availablePorts[1], InstanceId: null }];
         _this.serverMessenger.on("instance-launched", function (InstanceId) {
             _this.emit("instance-launched", InstanceId);
@@ -41,7 +42,7 @@ var ServerManager = (function (_super) {
     };
     ServerManager.prototype.launchInstance = function (InstanceId, Port) {
         var apiAppScript = path.join(__dirname, "../api/app.js");
-        cp.spawn("node.exe", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], { env: { "NODE_PATH": "C:\\test\\node_modules" } });
+        cp.spawn("node.exe", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], { env: { "NODE_PATH": this.NODE_PATH } });
         return Promise.resolve(null);
     };
     ServerManager.prototype.launchNewInstance = function () {
@@ -54,5 +55,5 @@ var ServerManager = (function (_super) {
     ServerManager.prototype.terminateInstance = function (InstanceId) { this.serverMessenger.notifyToTerminate(InstanceId); };
     return ServerManager;
 }(events.EventEmitter));
-function get(availablePorts, serverMessenger, msgPort) { return new ServerManager(availablePorts, serverMessenger, msgPort); }
+function get(availablePorts, msgPort, NODE_PATH, serverMessenger) { return new ServerManager(availablePorts, msgPort, NODE_PATH, serverMessenger); }
 exports.get = get;
