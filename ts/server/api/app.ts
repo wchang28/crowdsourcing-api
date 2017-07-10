@@ -46,6 +46,7 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
         console.log("req => <<end>>");
         count--;
         console.log("<<count-->> count=" + count.toString());
+        onUsageCountChanged();
     }).on("close", () => {
         console.log("req => <<close>>");
     }).on("error", (err: any) => {
@@ -95,7 +96,7 @@ app.get("/services/hi", (req: express.Request, res: express.Response) => {
     /*
     setTimeout(() => {
         res.jsonp({msg: "How are you?"});
-    }, 10000);
+    }, 30000);
     */
 });
 

@@ -38,6 +38,7 @@ app.use(function (req, res, next) {
         console.log("req => <<end>>");
         count--;
         console.log("<<count-->> count=" + count.toString());
+        onUsageCountChanged();
     }).on("close", function () {
         console.log("req => <<close>>");
     }).on("error", function (err) {
@@ -80,7 +81,7 @@ app.get("/services/hi", function (req, res) {
     /*
     setTimeout(() => {
         res.jsonp({msg: "How are you?"});
-    }, 10000);
+    }, 30000);
     */
 });
 //app.use('/services', servicesRouter);
