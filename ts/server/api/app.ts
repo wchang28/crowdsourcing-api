@@ -10,10 +10,12 @@ import {Message, ReadyContent} from "../gateway/message";
 let InstanceId = process.argv[2];
 let Port = parseInt(process.argv[3]);
 let MsgPort = parseInt(process.argv[4]);
+let NODE_PATH = process.env["NODE_PATH"];
 
 console.log("InstanceId=" + InstanceId);
 console.log("Port=" + Port);
 console.log("MsgPort=" + MsgPort);
+console.log("NODE_PATH=" + NODE_PATH);
 
 let app = express();
 
@@ -83,9 +85,6 @@ app.options("/*", (req: express.Request, res: express.Response) => {
     res.send(200);
 });
 
-//console.log("env=\n" + JSON.stringify(process.env, null, 2) + "\n");
-console.log("NODE_PATH=" + process.env["NODE_PATH"]);
-
 /*
 const uuid = require("uuid");
 console.log(uuid.v4());
@@ -104,7 +103,7 @@ msgClient.on("connect", (conn_id: string) => {
     msgClient.subscribe("/topic/" + InstanceId, (msg: rcf.IMessage) => {
         if (msg.body) {
             let message : Message = msg.body;
-            if (message.type = "terminate") {
+            if (message.type === "terminate") {
                 flagTerminationPending();
             }
         }
@@ -114,7 +113,6 @@ msgClient.on("connect", (conn_id: string) => {
         startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
             let protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-            let NODE_PATH = process.env["NODE_PATH"];
             let content: ReadyContent = {InstanceId, NODE_PATH};
             let msg: Message = {type: "ready", content};
             msgClient.send("/topic/gateway", {}, msg);

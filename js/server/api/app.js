@@ -10,9 +10,11 @@ var node$ = require("rest-node");
 var InstanceId = process.argv[2];
 var Port = parseInt(process.argv[3]);
 var MsgPort = parseInt(process.argv[4]);
+var NODE_PATH = process.env["NODE_PATH"];
 console.log("InstanceId=" + InstanceId);
 console.log("Port=" + Port);
 console.log("MsgPort=" + MsgPort);
+console.log("NODE_PATH=" + NODE_PATH);
 var app = express();
 app.set('jsonp callback name', 'cb');
 app.use(noCache);
@@ -70,8 +72,6 @@ app.options("/*", function (req, res) {
     res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Content-Length,X-Requested-With');
     res.send(200);
 });
-//console.log("env=\n" + JSON.stringify(process.env, null, 2) + "\n");
-console.log("NODE_PATH=" + process.env["NODE_PATH"]);
 /*
 const uuid = require("uuid");
 console.log(uuid.v4());
@@ -87,7 +87,7 @@ msgClient.on("connect", function (conn_id) {
     msgClient.subscribe("/topic/" + InstanceId, function (msg) {
         if (msg.body) {
             var message = msg.body;
-            if (message.type = "terminate") {
+            if (message.type === "terminate") {
                 flagTerminationPending();
             }
         }
@@ -97,7 +97,6 @@ msgClient.on("connect", function (conn_id) {
         express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, app, function (secure, host, port) {
             var protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-            var NODE_PATH = process.env["NODE_PATH"];
             var content = { InstanceId: InstanceId, NODE_PATH: NODE_PATH };
             var msg = { type: "ready", content: content };
             msgClient.send("/topic/gateway", {}, msg);
