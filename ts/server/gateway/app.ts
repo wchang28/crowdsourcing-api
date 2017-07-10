@@ -70,12 +70,8 @@ let stateMachine = sm.get(getServerManager(config.availableApiServerPorts, new S
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
     console.log(new Date().toISOString() + ': state machine reports a <ready> state. starting the api proxy server...');
     let appProxy = express();
-    let options: proxy.Options = {
-        targetAcquisition: (req: express.Request) => {
-            return Promise.resolve<proxy.TargetSettings>({targetUrl: stateMachine.TargetInstanceUrl + "/services"});
-        }
-    }
-    appProxy.use("/services", proxy.get(options));
+    let targetAcquisition = (req: express.Request) => Promise.resolve<proxy.TargetSettings>({targetUrl: stateMachine.TargetInstanceUrl + "/services"});
+    appProxy.use("/services", proxy.get({targetAcquisition}));
 
     startServer(config.proxyServerConfig, appProxy, (secure:boolean, host:string, port:number) => {
         let protocol = (secure ? 'https' : 'http');

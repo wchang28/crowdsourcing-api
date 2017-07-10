@@ -73,12 +73,8 @@ var stateMachine = sm.get(server_mgr_1.get(config.availableApiServerPorts, new S
 stateMachine.on("ready", function () {
     console.log(new Date().toISOString() + ': state machine reports a <ready> state. starting the api proxy server...');
     var appProxy = express();
-    var options = {
-        targetAcquisition: function (req) {
-            return Promise.resolve({ targetUrl: stateMachine.TargetInstanceUrl + "/services" });
-        }
-    };
-    appProxy.use("/services", proxy.get(options));
+    var targetAcquisition = function (req) { return Promise.resolve({ targetUrl: stateMachine.TargetInstanceUrl + "/services" }); };
+    appProxy.use("/services", proxy.get({ targetAcquisition: targetAcquisition }));
     express_web_server_1.startServer(config.proxyServerConfig, appProxy, function (secure, host, port) {
         var protocol = (secure ? 'https' : 'http');
         console.log(new Date().toISOString() + ': api gateway proxy server listening at %s://%s:%s', protocol, host, port);
