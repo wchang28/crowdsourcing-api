@@ -1,14 +1,6 @@
 
-import {HTTPMethod} from "rcf";
-import {RequestHandler} from "express";
+import * as express from "express";
 
-export type MethodType = HTTPMethod | "USE";
-export {RequestHandler} from "express";
-
-export interface ExtensionModuleExportItem {
-    pathname: string;
-    method: MethodType;
-    requestHandlers: RequestHandler | RequestHandler[];
+export interface ExtensionModuleExport {
+    init(router: express.Router): void;
 }
-
-export type ExtensionModuleExport = ExtensionModuleExportItem[];

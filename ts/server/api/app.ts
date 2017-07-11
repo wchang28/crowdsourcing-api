@@ -87,63 +87,25 @@ app.options("/*", (req: express.Request, res: express.Response) => {
     res.send(200);
 });
 
-function getExpressMethodFunctionBindedToApp(method: string) : (path: any, handlers: express.RequestHandler | express.RequestHandler[]) => any {
-    let methodFunction: Function = app[method.toLowerCase()];
-    return methodFunction.bind(app);
-}
+let serviceRouter = express.Router();
 
 let extensionModules = getAllExtensionModules(NODE_PATH);
 for (let i in extensionModules) {   // for each module
     let module = extensionModules[i].module;
     try {
         let moduleExport: ExtensionModuleExport = require(module);
-        for (let j in moduleExport) {  // for each item
-            let exportItem = moduleExport[j];
-            if (exportItem && exportItem.method && exportItem.pathname && exportItem.requestHandlers && exportItem.requestHandlers.length > 0) {
-                let methodFunc = getExpressMethodFunctionBindedToApp(exportItem.method);
-                let apiPath = "/services" + exportItem.pathname;
-                if (apiPath.substr(apiPath.length - 1, 1) === "/") apiPath = apiPath.substr(0, apiPath.length - 1);
-                methodFunc(apiPath, exportItem.requestHandlers);
-            }
-        }
+        let moduleRouter = express.Router();
+        serviceRouter.use("/" + module, moduleRouter);
+        moduleExport.init(moduleRouter);
     } catch(e) {
 
     }
 }
 
-/*
-getExpressMethodFunctionBindedToApp("USE")("/services", [(req: express.Request, res: express.Response, next: express.NextFunction) => {
-    req["__my_msg"] = "How are you gent 2?";
-    next();
-}]);
-*/
+app.use("/services", serviceRouter);
 
 /*
-let method = "GET";
-let methodFunc = getExpressMethodFunctionBindedToApp(method);
-let pathname = "/hi";
-let apiPath = "/services" + pathname;
-if (apiPath.substr(apiPath.length - 1, 1) === "/") apiPath = apiPath.substr(0, apiPath.length - 1);
-methodFunc(apiPath, [
-    (req: express.Request, res: express.Response) => {
-        res.jsonp(req["__my_msg"]);
-    }
-]);
-*/
-
-/*
-let method = "GET";
-let methodFunc = getExpressMethodFunctionBindedToApp(method);
-let pathname = "/hi";
-let apiPath = "/services" + pathname;
-if (apiPath.substr(apiPath.length - 1, 1) === "/") apiPath = apiPath.substr(0, apiPath.length - 1);
-methodFunc(apiPath, (req: express.Request, res: express.Response) => {
-        res.jsonp(req["__my_msg"]);
-});
-*/
-
-/*
-app.get("/services/hi", (req: express.Request, res: express.Response) => {
+app.get("/services/sample/hi", (req: express.Request, res: express.Response) => {
     res.jsonp({msg: "How are you sir?"});
     //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);
 });
@@ -162,6 +124,7 @@ msgClient.on("connect", (conn_id: string) => {
     }).then((sub_id: string) => {
         console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
         console.log(new Date().toISOString() + ": starting the web server");
+        
         startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
             let protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);

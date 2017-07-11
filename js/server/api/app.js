@@ -73,59 +73,22 @@ app.options("/*", function (req, res) {
     res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Content-Length,X-Requested-With');
     res.send(200);
 });
-function getExpressMethodFunctionBindedToApp(method) {
-    var methodFunction = app[method.toLowerCase()];
-    return methodFunction.bind(app);
-}
+var serviceRouter = express.Router();
 var extensionModules = extensions_1.getAllExtensionModules(NODE_PATH);
 for (var i in extensionModules) {
     var module_1 = extensionModules[i].module;
     try {
         var moduleExport = require(module_1);
-        for (var j in moduleExport) {
-            var exportItem = moduleExport[j];
-            if (exportItem && exportItem.method && exportItem.pathname && exportItem.requestHandlers && exportItem.requestHandlers.length > 0) {
-                var methodFunc = getExpressMethodFunctionBindedToApp(exportItem.method);
-                var apiPath = "/services" + exportItem.pathname;
-                if (apiPath.substr(apiPath.length - 1, 1) === "/")
-                    apiPath = apiPath.substr(0, apiPath.length - 1);
-                methodFunc(apiPath, exportItem.requestHandlers);
-            }
-        }
+        var moduleRouter = express.Router();
+        serviceRouter.use("/" + module_1, moduleRouter);
+        moduleExport.init(moduleRouter);
     }
     catch (e) {
     }
 }
+app.use("/services", serviceRouter);
 /*
-getExpressMethodFunctionBindedToApp("USE")("/services", [(req: express.Request, res: express.Response, next: express.NextFunction) => {
-    req["__my_msg"] = "How are you gent 2?";
-    next();
-}]);
-*/
-/*
-let method = "GET";
-let methodFunc = getExpressMethodFunctionBindedToApp(method);
-let pathname = "/hi";
-let apiPath = "/services" + pathname;
-if (apiPath.substr(apiPath.length - 1, 1) === "/") apiPath = apiPath.substr(0, apiPath.length - 1);
-methodFunc(apiPath, [
-    (req: express.Request, res: express.Response) => {
-        res.jsonp(req["__my_msg"]);
-    }
-]);
-*/
-/*
-let method = "GET";
-let methodFunc = getExpressMethodFunctionBindedToApp(method);
-let pathname = "/hi";
-let apiPath = "/services" + pathname;
-if (apiPath.substr(apiPath.length - 1, 1) === "/") apiPath = apiPath.substr(0, apiPath.length - 1);
-methodFunc(apiPath, (req: express.Request, res: express.Response) => {
-        res.jsonp(req["__my_msg"]);
-});
-*/
-/*
-app.get("/services/hi", (req: express.Request, res: express.Response) => {
+app.get("/services/sample/hi", (req: express.Request, res: express.Response) => {
     res.jsonp({msg: "How are you sir?"});
     //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);
 });
