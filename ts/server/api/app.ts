@@ -76,5 +76,7 @@ msgClient.on("connect", (conn_id: string) => {
     });
 }).on("error", (err: any) => {
     console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));
+}).on("ping", () => {
+    console.log(new Date().toISOString() + ": <<PING>>");
 });
 
