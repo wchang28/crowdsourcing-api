@@ -1,14 +1,10 @@
 import * as express from 'express';
 import {IWebServerConfig, startServer} from 'express-web-server';
-import * as bodyParser from "body-parser";
-import noCache = require('no-cache-express');
-import * as prettyPrinter from 'express-pretty-print';
 import * as rc from "express-req-counter";
 import * as rcf from "rcf";
 import * as node$ from "rest-node";
 import {Message, ReadyContent} from "../message";
-import {getAllExtensionModules} from "../extensions";
-import {ExtensionModuleExport} from "../../index";
+import * as af from "./app-factory";
 
 let InstanceId = process.argv[2];
 let Port = parseInt(process.argv[3]);
@@ -34,91 +30,13 @@ function flagTerminationPending() {
         process.exit(0);
 }
 
-/*
-let terminationPending = false;
-let count = 0;
+let appFactory = af.get();
 
-function flagTerminationPending() {
-    terminationPending = true;
-    if (count === 0)
-        process.exit(0);
-}
-
-function onUsageCountChanged() {
-    if (terminationPending && count === 0)
-        process.exit(0);
-}
-
-app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    count++;
-    console.log("\n<<count++>> count=" + count.toString());
-    onUsageCountChanged();
-    req.on("end", () => {
-        console.log("req => <<end>>");
-        count--;
-        console.log("<<count-->> count=" + count.toString());
-        onUsageCountChanged();
-    }).on("close", () => {
-        console.log("req => <<close>>");
-    }).on("error", (err: any) => {
-        console.log("req => <<error>>, err=" + JSON.stringify(err));
-    });
-
-    res.on("finish", () => {
-        console.log("res => <<finish>>");
-    }).on("close", () => {
-        console.log("res => <<close>>");
-        count--;
-        console.log("<<count-->> count=" + count.toString());
-        onUsageCountChanged();
-    }).on("error", (err: any) => {
-        console.log("res => <<error>>, err=" + JSON.stringify(err));
-    });
-    next();
-});
-*/
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-let app = express();
-
-app.use(reqCounter.Middleware);
-
-app.set('jsonp callback name', 'cb');
-
-app.use(noCache);
-app.use(bodyParser.text({"limit":"999mb"}));
-app.use(bodyParser.json({"limit":"999mb"}));
-app.use(prettyPrinter.get());
-
-app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    next();
+appFactory.on("app-just-created", (app: express.Express) => {
+    app.use(reqCounter.Middleware);
 });
 
-app.options("/*", (req: express.Request, res: express.Response) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH,HEAD');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Content-Length,X-Requested-With');
-    res.send(200);
-});
-
-let serviceRouter = express.Router();
-
-let extensionModules = getAllExtensionModules(NODE_PATH);
-for (let i in extensionModules) {   // for each module
-    let module = extensionModules[i].module;
-    try {
-        let moduleExport: ExtensionModuleExport = require(module);
-        let moduleRouter = express.Router();
-        serviceRouter.use("/" + module, moduleRouter);
-        moduleExport.init(moduleRouter);
-    } catch(e) {
-
-    }
-}
-
-app.use("/services", serviceRouter);
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+let app = appFactory.create();
 
 let api = new rcf.AuthorizedRestApi(node$.get(), {instance_url: "http://127.0.0.1:" + MsgPort.toString()});
 let msgClient = api.$M("/msg/events/event_stream", {reconnetIntervalMS: 3000});
