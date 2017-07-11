@@ -1,4 +1,3 @@
-
 import * as express from "express";
 
 export interface ExtensionModuleExport {
