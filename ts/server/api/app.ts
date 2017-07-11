@@ -20,6 +20,21 @@ console.log("Port=" + Port);
 console.log("MsgPort=" + MsgPort);
 console.log("NODE_PATH=" + NODE_PATH);
 
+let terminationPending = false;
+
+let reqCounter = rc.get();
+reqCounter.on("zero-count", () => {
+    if (terminationPending)
+        process.exit(0);
+})
+
+function flagTerminationPending() {
+    terminationPending = true;
+    if (reqCounter.Counter === 0)
+        process.exit(0);
+}
+
+
 let app = express();
 
 app.set('jsonp callback name', 'cb');
@@ -73,20 +88,6 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
     next();
 });
 */
-
-let terminationPending = false;
-
-let reqCounter = rc.get();
-reqCounter.on("zero-count", () => {
-    if (terminationPending)
-        process.exit(0);
-})
-
-function flagTerminationPending() {
-    terminationPending = true;
-    if (reqCounter.Counter === 0)
-        process.exit(0);
-}
 
 app.use(reqCounter.Middleware);
 

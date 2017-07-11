@@ -17,6 +17,17 @@ console.log("InstanceId=" + InstanceId);
 console.log("Port=" + Port);
 console.log("MsgPort=" + MsgPort);
 console.log("NODE_PATH=" + NODE_PATH);
+var terminationPending = false;
+var reqCounter = rc.get();
+reqCounter.on("zero-count", function () {
+    if (terminationPending)
+        process.exit(0);
+});
+function flagTerminationPending() {
+    terminationPending = true;
+    if (reqCounter.Counter === 0)
+        process.exit(0);
+}
 var app = express();
 app.set('jsonp callback name', 'cb');
 app.use(noCache);
@@ -66,17 +77,6 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
     next();
 });
 */
-var terminationPending = false;
-var reqCounter = rc.get();
-reqCounter.on("zero-count", function () {
-    if (terminationPending)
-        process.exit(0);
-});
-function flagTerminationPending() {
-    terminationPending = true;
-    if (reqCounter.Counter === 0)
-        process.exit(0);
-}
 app.use(reqCounter.Middleware);
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
