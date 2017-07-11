@@ -42,7 +42,8 @@ var ServerManager = (function (_super) {
     };
     ServerManager.prototype.launchInstance = function (InstanceId, Port) {
         var apiAppScript = path.join(__dirname, "../api/app.js");
-        cp.spawn("node", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], { env: { "NODE_PATH": this.NODE_PATH } });
+        //cp.spawn("node", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], {env: {"NODE_PATH": this.NODE_PATH}});
+        cp.spawn("c:\\run\\cmd\\helper.bat", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], { env: { "NODE_PATH": this.NODE_PATH } });
         return Promise.resolve(null);
     };
     ServerManager.prototype.launchNewInstance = function () {

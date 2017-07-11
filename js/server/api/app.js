@@ -32,6 +32,7 @@ var app = appFactory.create();
 var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
 var msgClient = api.$M("/msg/events/event_stream", { reconnetIntervalMS: 3000 });
 msgClient.on("connect", function (conn_id) {
+    console.log(new Date().toISOString() + ": connected :-) conn_id=" + conn_id);
     msgClient.subscribe("/topic/" + InstanceId, function (msg) {
         if (msg.body) {
             var message = msg.body;

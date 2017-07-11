@@ -65,6 +65,8 @@ var ServerMessenger = (function (_super) {
         }).on("client_disconnect", function (req, connection) {
             var InstanceId = connection.cookie;
             _this.emit("instance-terminated", InstanceId);
+        }).on("client_cmd", function (req, cmt_type, conn_id, data) {
+            console.log("\n [[ " + cmt_type + " ]]\n");
         });
         return _this;
     }

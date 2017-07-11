@@ -62,6 +62,8 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
         }).on("client_disconnect", (req:express.Request, connection: tr.ITopicConnection) => {
             let InstanceId: ServerId = connection.cookie;
             this.emit("instance-terminated", InstanceId);
+        }).on("client_cmd", (req, cmt_type, conn_id, data) => {
+            console.log("\n [[ " + cmt_type + " ]]\n");
         });
     }
     notifyToTerminate(InstanceId: string): void {
