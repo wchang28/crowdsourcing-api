@@ -6,7 +6,7 @@ import * as prettyPrinter from 'express-pretty-print';
 import * as rcf from "rcf";
 import * as node$ from "rest-node";
 import {Message, ReadyContent} from "../message";
-import {getAllExtensionModules} from "./extensions";
+import {getAllExtensionModules} from "../extensions";
 import {ExtensionModuleExport} from "../../index";
 
 let InstanceId = process.argv[2];
