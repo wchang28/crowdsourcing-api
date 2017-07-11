@@ -48,6 +48,7 @@ var ServerMessenger = (function (_super) {
         var _this = _super.call(this) || this;
         _this.connectionsManager = connectionsManager;
         _this.connectionsManager.on("on_client_send_msg", function (req, connection, params) {
+            console.log("\n:-) <<< MESSAGE RCVD >>> :-)\n");
             if (params.destination === '/topic/gateway') {
                 var msg = params.body;
                 if (msg.type === "ready") {

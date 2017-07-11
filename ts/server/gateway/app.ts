@@ -45,6 +45,7 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
     constructor(private connectionsManager: tr.IConnectionsManager) {
         super();
         this.connectionsManager.on("on_client_send_msg", (req:express.Request, connection: tr.ITopicConnection, params: tr.SendMsgParams) => {
+            console.log("\n:-) <<< MESSAGE RCVD >>> :-)\n");
             if (params.destination === '/topic/gateway') {
                 let msg:Message = params.body;
                 if (msg.type === "ready") {
