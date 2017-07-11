@@ -16,13 +16,15 @@ var bodyParser = require("body-parser");
 var noCache = require("no-cache-express");
 var prettyPrinter = require("express-pretty-print");
 var extensions_1 = require("../extensions");
-var NODE_PATH = process.env["NODE_PATH"];
 var APIAppFactory = (function (_super) {
     __extends(APIAppFactory, _super);
     function APIAppFactory() {
         return _super.call(this) || this;
     }
     APIAppFactory.prototype.create = function () {
+        var NODE_PATH = process.env["NODE_PATH"];
+        if (!NODE_PATH)
+            throw "env['NODE_PATH'] is not set";
         var app = express();
         this.emit("app-just-created", app);
         app.set('jsonp callback name', 'cb');

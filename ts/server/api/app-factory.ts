@@ -6,8 +6,6 @@ import * as prettyPrinter from 'express-pretty-print';
 import {getAllExtensionModules} from "../extensions";
 import {ExtensionModuleExport} from "../../index";
 
-let NODE_PATH = process.env["NODE_PATH"];
-
 export interface IAPIAppFactory {
     create() : express.Express;
     on(event: "app-just-created", listener: (app: express.Express) => void) : this;
@@ -18,6 +16,8 @@ class APIAppFactory extends events.EventEmitter implements IAPIAppFactory {
         super();
     }
     create() : express.Express {    // create the api app
+        let NODE_PATH = process.env["NODE_PATH"];
+        if (!NODE_PATH) throw "env['NODE_PATH'] is not set";
         let app = express();
         this.emit("app-just-created", app);
 
