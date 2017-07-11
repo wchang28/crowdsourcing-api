@@ -5,6 +5,7 @@ var express_web_server_1 = require("express-web-server");
 var bodyParser = require("body-parser");
 var noCache = require("no-cache-express");
 var prettyPrinter = require("express-pretty-print");
+var rc = require("express-req-counter");
 var rcf = require("rcf");
 var node$ = require("rest-node");
 var extensions_1 = require("../extensions");
@@ -22,47 +23,61 @@ app.use(noCache);
 app.use(bodyParser.text({ "limit": "999mb" }));
 app.use(bodyParser.json({ "limit": "999mb" }));
 app.use(prettyPrinter.get());
-var terminationPending = false;
-var count = 0;
+/*
+let terminationPending = false;
+let count = 0;
+
 function flagTerminationPending() {
     terminationPending = true;
     if (count === 0)
         process.exit(0);
 }
+
 function onUsageCountChanged() {
     if (terminationPending && count === 0)
         process.exit(0);
 }
-app.use(function (req, res, next) {
+
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
     count++;
     console.log("\n<<count++>> count=" + count.toString());
     onUsageCountChanged();
-    req.on("end", function () {
+    req.on("end", () => {
         console.log("req => <<end>>");
         count--;
         console.log("<<count-->> count=" + count.toString());
         onUsageCountChanged();
-    }).on("close", function () {
+    }).on("close", () => {
         console.log("req => <<close>>");
-    }).on("error", function (err) {
+    }).on("error", (err: any) => {
         console.log("req => <<error>>, err=" + JSON.stringify(err));
     });
-    res.on("finish", function () {
+
+    res.on("finish", () => {
         console.log("res => <<finish>>");
-    }).on("close", function () {
+    }).on("close", () => {
         console.log("res => <<close>>");
         count--;
         console.log("<<count-->> count=" + count.toString());
         onUsageCountChanged();
-    }).on("error", function (err) {
+    }).on("error", (err: any) => {
         console.log("res => <<error>>, err=" + JSON.stringify(err));
     });
     next();
 });
-app.use(function (req, res, next) {
-    console.log("\n" + new Date().toISOString() + ': method=' + req.method + ', url=' + req.url + "\nheaders=\n" + JSON.stringify(req.headers, null, 2));
-    next();
+*/
+var terminationPending = false;
+var reqCounter = rc.get();
+reqCounter.on("zero-count", function () {
+    if (terminationPending)
+        process.exit(0);
 });
+function flagTerminationPending() {
+    terminationPending = true;
+    if (reqCounter.Counter === 0)
+        process.exit(0);
+}
+app.use(reqCounter.Middleware);
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     next();

@@ -3,6 +3,7 @@ import {IWebServerConfig, startServer} from 'express-web-server';
 import * as bodyParser from "body-parser";
 import noCache = require('no-cache-express');
 import * as prettyPrinter from 'express-pretty-print';
+import * as rc from "express-req-counter";
 import * as rcf from "rcf";
 import * as node$ from "rest-node";
 import {Message, ReadyContent} from "../message";
@@ -28,6 +29,8 @@ app.use(bodyParser.text({"limit":"999mb"}));
 app.use(bodyParser.json({"limit":"999mb"}));
 app.use(prettyPrinter.get());
 
+
+/*
 let terminationPending = false;
 let count = 0;
 
@@ -69,11 +72,23 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
     });
     next();
 });
+*/
 
-app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log("\n" + new Date().toISOString() + ': method=' + req.method + ', url=' + req.url + "\nheaders=\n" + JSON.stringify(req.headers, null, 2));
-    next();
-});
+let terminationPending = false;
+
+let reqCounter = rc.get();
+reqCounter.on("zero-count", () => {
+    if (terminationPending)
+        process.exit(0);
+})
+
+function flagTerminationPending() {
+    terminationPending = true;
+    if (reqCounter.Counter === 0)
+        process.exit(0);
+}
+
+app.use(reqCounter.Middleware);
 
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -121,6 +136,7 @@ msgClient.on("connect", (conn_id: string) => {
         startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
             let protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
+
             let content: ReadyContent = {InstanceId, NODE_PATH};
             let msg: Message = {type: "ready", content};
             msgClient.send("/topic/gateway", {}, msg);
