@@ -1,5 +1,5 @@
 /// <reference types="express" />
 import * as express from "express";
 export interface ExtensionModuleExport {
-    init(router: express.Router): void;
+    init(moduleRouter: express.Router): void;
 }
