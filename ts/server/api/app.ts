@@ -87,7 +87,7 @@ app.options("/*", (req: express.Request, res: express.Response) => {
     res.send(200);
 });
 
-function getExpressMethodFunctionBindedToApp(method: string) : (path: any, handlers: express.RequestHandler[]) => any {
+function getExpressMethodFunctionBindedToApp(method: string) : (path: any, handlers: express.RequestHandler | express.RequestHandler[]) => any {
     let methodFunction: Function = app[method.toLowerCase()];
     return methodFunction.bind(app);
 }
@@ -113,10 +113,12 @@ for (let i in extensionModules) {   // for each module
 
 /*
 getExpressMethodFunctionBindedToApp("USE")("/services", [(req: express.Request, res: express.Response, next: express.NextFunction) => {
-    req["__my_msg"] = "How are you gent?";
+    req["__my_msg"] = "How are you gent 2?";
     next();
 }]);
+*/
 
+/*
 let method = "GET";
 let methodFunc = getExpressMethodFunctionBindedToApp(method);
 let pathname = "/hi";
@@ -127,6 +129,17 @@ methodFunc(apiPath, [
         res.jsonp(req["__my_msg"]);
     }
 ]);
+*/
+
+/*
+let method = "GET";
+let methodFunc = getExpressMethodFunctionBindedToApp(method);
+let pathname = "/hi";
+let apiPath = "/services" + pathname;
+if (apiPath.substr(apiPath.length - 1, 1) === "/") apiPath = apiPath.substr(0, apiPath.length - 1);
+methodFunc(apiPath, (req: express.Request, res: express.Response) => {
+        res.jsonp(req["__my_msg"]);
+});
 */
 
 /*
