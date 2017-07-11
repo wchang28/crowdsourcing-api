@@ -58,7 +58,12 @@ msgClient.on("connect", (conn_id: string) => {
 
             let content: ReadyContent = {InstanceId, NODE_PATH};
             let msg: Message = {type: "ready", content};
-            msgClient.send("/topic/gateway", {}, msg);
+            msgClient.send("/topic/gateway", {}, msg).then(() => {
+                console.log(new Date().toISOString() + ": <<ready>> message sent");
+            }).catch((err: any) => {
+                console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
+                process.exit(1);
+            });
         }, (err:any) => {
             console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
             process.exit(1);

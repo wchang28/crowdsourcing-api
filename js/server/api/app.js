@@ -47,7 +47,12 @@ msgClient.on("connect", function (conn_id) {
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
             var content = { InstanceId: InstanceId, NODE_PATH: NODE_PATH };
             var msg = { type: "ready", content: content };
-            msgClient.send("/topic/gateway", {}, msg);
+            msgClient.send("/topic/gateway", {}, msg).then(function () {
+                console.log(new Date().toISOString() + ": <<ready>> message sent");
+            }).catch(function (err) {
+                console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
+                process.exit(1);
+            });
         }, function (err) {
             console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
             process.exit(1);
