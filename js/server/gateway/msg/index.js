@@ -16,7 +16,9 @@ destAuthRouter.get("/topic/:InstanceId", tr.destAuth((req: tr.DestAuthRequest, r
 }));
 */
 var options = {
-    connKeepAliveIntervalMS: 10000,
+    connKeepAliveIntervalMS: 10000
+    //connKeepAliveIntervalMS: 0
+    ,
     dispatchMsgOnClientSend: false
     //,destinationAuthorizeRouter: destAuthRouter
 };

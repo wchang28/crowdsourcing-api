@@ -45,7 +45,6 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
     constructor(private connectionsManager: tr.IConnectionsManager) {
         super();
         this.connectionsManager.on("on_client_send_msg", (req:express.Request, connection: tr.ITopicConnection, params: tr.SendMsgParams) => {
-            console.log("\n:-) <<< MESSAGE RCVD >>> :-)\n");
             if (params.destination === '/topic/gateway') {
                 let msg:Message = params.body;
                 if (msg.type === "ready") {
@@ -62,8 +61,6 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
         }).on("client_disconnect", (req:express.Request, connection: tr.ITopicConnection) => {
             let InstanceId: ServerId = connection.cookie;
             this.emit("instance-terminated", InstanceId);
-        }).on("client_cmd", (req, cmt_type, conn_id, data) => {
-            console.log("\n [[ " + cmt_type + " ]]\n");
         });
     }
     notifyToTerminate(InstanceId: string): void {
