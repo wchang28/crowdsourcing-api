@@ -71,13 +71,14 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
     next();
 });
 */
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var app = express();
+app.use(reqCounter.Middleware);
 app.set('jsonp callback name', 'cb');
 app.use(noCache);
 app.use(bodyParser.text({ "limit": "999mb" }));
 app.use(bodyParser.json({ "limit": "999mb" }));
 app.use(prettyPrinter.get());
-app.use(reqCounter.Middleware);
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     next();
@@ -102,6 +103,7 @@ for (var i in extensionModules) {
     }
 }
 app.use("/services", serviceRouter);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
 var msgClient = api.$M("/msg/events/event_stream", { reconnetIntervalMS: 3000 });
 msgClient.on("connect", function (conn_id) {
