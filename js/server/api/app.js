@@ -87,12 +87,6 @@ for (var i in extensionModules) {
     }
 }
 app.use("/services", serviceRouter);
-/*
-app.get("/services/sample/hi", (req: express.Request, res: express.Response) => {
-    res.jsonp({msg: "How are you sir?"});
-    //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);
-});
-*/
 var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
 var msgClient = api.$M("/msg/events/event_stream", { reconnetIntervalMS: 3000 });
 msgClient.on("connect", function (conn_id) {

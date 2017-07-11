@@ -104,13 +104,6 @@ for (let i in extensionModules) {   // for each module
 
 app.use("/services", serviceRouter);
 
-/*
-app.get("/services/sample/hi", (req: express.Request, res: express.Response) => {
-    res.jsonp({msg: "How are you sir?"});
-    //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);
-});
-*/
-
 let api = new rcf.AuthorizedRestApi(node$.get(), {instance_url: "http://127.0.0.1:" + MsgPort.toString()});
 let msgClient = api.$M("/msg/events/event_stream", {reconnetIntervalMS: 3000});
 msgClient.on("connect", (conn_id: string) => {
@@ -124,7 +117,7 @@ msgClient.on("connect", (conn_id: string) => {
     }).then((sub_id: string) => {
         console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
         console.log(new Date().toISOString() + ": starting the web server");
-        
+
         startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
             let protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
