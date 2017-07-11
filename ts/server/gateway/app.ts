@@ -35,9 +35,9 @@ appMsg.use('/msg', msgRouter);
 
 startServer(config.msgServerConfig, appMsg, (secure:boolean, host:string, port:number) => {
     let protocol = (secure ? 'https' : 'http');
-    console.log(new Date().toISOString() + ': api gateway msg server listening at %s://%s:%s', protocol, host, port);
+    console.log(new Date().toISOString() + ': api gateway <MSG> server listening at %s://%s:%s', protocol, host, port);
 }, (err:any) => {
-    console.error(new Date().toISOString() + ': !!! api gateway msg server error: ' + JSON.stringify(err));
+    console.error(new Date().toISOString() + ': !!! api gateway <MSG> server error: ' + JSON.stringify(err));
     process.exit(1);
 });
 
@@ -51,7 +51,7 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
                     let content: ReadyContent = msg.content;
                     let InstanceId = content.InstanceId;
                     if (content.NODE_PATH)
-                        console.log(new Date().toISOString() + ": new server reported NODE_PATH=" + content.NODE_PATH);
+                        console.log(new Date().toISOString() + ": NEW server reported NODE_PATH=" + content.NODE_PATH);
                     else
                         console.error(new Date().toISOString() + "!!! Error: server did not receive NODE_PATH env. variable");
                     connection.cookie = InstanceId;
@@ -80,9 +80,9 @@ stateMachine.on("ready", () => {    // api server is ready => get the proxy read
 
     startServer(config.proxyServerConfig, appProxy, (secure:boolean, host:string, port:number) => {
         let protocol = (secure ? 'https' : 'http');
-        console.log(new Date().toISOString() + ': api gateway proxy server listening at %s://%s:%s', protocol, host, port);
+        console.log(new Date().toISOString() + ': api gateway <PROXY> server listening at %s://%s:%s', protocol, host, port);
     }, (err:any) => {
-        console.error(new Date().toISOString() + ': !!! api gateway proxy server error: ' + JSON.stringify(err));
+        console.error(new Date().toISOString() + ': !!! api gateway <PROXY> server error: ' + JSON.stringify(err));
         process.exit(1);
     });
 }).on("change", () => {
@@ -107,9 +107,9 @@ appAdmin.use("/services", servicesRouter);
 
 startServer(config.adminServerConfig, appAdmin, (secure:boolean, host:string, port:number) => {
     let protocol = (secure ? 'https' : 'http');
-    console.log(new Date().toISOString() + ': api gateway admin server listening at %s://%s:%s', protocol, host, port);
+    console.log(new Date().toISOString() + ': api gateway <ADMIN> server listening at %s://%s:%s', protocol, host, port);
     stateMachine.initialize();
 }, (err:any) => {
-    console.error(new Date().toISOString() + ': !!! api gateway admin server error: ' + JSON.stringify(err));
+    console.error(new Date().toISOString() + ': !!! api gateway <ADMIN> server error: ' + JSON.stringify(err));
     process.exit(1);
 });

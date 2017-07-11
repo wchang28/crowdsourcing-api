@@ -37,9 +37,9 @@ appMsg.use(prettyPrinter.get());
 appMsg.use('/msg', msg_1.Router);
 express_web_server_1.startServer(config.msgServerConfig, appMsg, function (secure, host, port) {
     var protocol = (secure ? 'https' : 'http');
-    console.log(new Date().toISOString() + ': api gateway msg server listening at %s://%s:%s', protocol, host, port);
+    console.log(new Date().toISOString() + ': api gateway <MSG> server listening at %s://%s:%s', protocol, host, port);
 }, function (err) {
-    console.error(new Date().toISOString() + ': !!! api gateway msg server error: ' + JSON.stringify(err));
+    console.error(new Date().toISOString() + ': !!! api gateway <MSG> server error: ' + JSON.stringify(err));
     process.exit(1);
 });
 var ServerMessenger = (function (_super) {
@@ -54,7 +54,7 @@ var ServerMessenger = (function (_super) {
                     var content = msg.content;
                     var InstanceId = content.InstanceId;
                     if (content.NODE_PATH)
-                        console.log(new Date().toISOString() + ": new server reported NODE_PATH=" + content.NODE_PATH);
+                        console.log(new Date().toISOString() + ": NEW server reported NODE_PATH=" + content.NODE_PATH);
                     else
                         console.error(new Date().toISOString() + "!!! Error: server did not receive NODE_PATH env. variable");
                     connection.cookie = InstanceId;
@@ -82,9 +82,9 @@ stateMachine.on("ready", function () {
     appProxy.use("/services", proxy.get({ targetAcquisition: targetAcquisition }));
     express_web_server_1.startServer(config.proxyServerConfig, appProxy, function (secure, host, port) {
         var protocol = (secure ? 'https' : 'http');
-        console.log(new Date().toISOString() + ': api gateway proxy server listening at %s://%s:%s', protocol, host, port);
+        console.log(new Date().toISOString() + ': api gateway <PROXY> server listening at %s://%s:%s', protocol, host, port);
     }, function (err) {
-        console.error(new Date().toISOString() + ': !!! api gateway proxy server error: ' + JSON.stringify(err));
+        console.error(new Date().toISOString() + ': !!! api gateway <PROXY> server error: ' + JSON.stringify(err));
         process.exit(1);
     });
 }).on("change", function () {
@@ -104,9 +104,9 @@ appAdmin.set("global", g);
 appAdmin.use("/services", services_1.Router);
 express_web_server_1.startServer(config.adminServerConfig, appAdmin, function (secure, host, port) {
     var protocol = (secure ? 'https' : 'http');
-    console.log(new Date().toISOString() + ': api gateway admin server listening at %s://%s:%s', protocol, host, port);
+    console.log(new Date().toISOString() + ': api gateway <ADMIN> server listening at %s://%s:%s', protocol, host, port);
     stateMachine.initialize();
 }, function (err) {
-    console.error(new Date().toISOString() + ': !!! api gateway admin server error: ' + JSON.stringify(err));
+    console.error(new Date().toISOString() + ': !!! api gateway <ADMIN> server error: ' + JSON.stringify(err));
     process.exit(1);
 });
