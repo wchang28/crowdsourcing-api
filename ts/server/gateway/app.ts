@@ -69,7 +69,8 @@ class ServerMessenger extends events.EventEmitter implements IServerMessenger {
     }
 }
 
-let serverManager = getServerManager(config.availableApiServerPorts, config.msgServerConfig.http.port, config.NODE_PATH, new ServerMessenger(ConnectionsManager));
+let serverMessanger = new ServerMessenger(ConnectionsManager);
+let serverManager = getServerManager(config.availableApiServerPorts, config.msgServerConfig.http.port, config.NODE_PATH, serverMessanger);
 let stateMachine = sm.get(serverManager);
 
 stateMachine.on("ready", () => {    // api server is ready => get the proxy ready
