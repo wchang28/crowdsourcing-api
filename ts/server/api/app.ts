@@ -112,6 +112,20 @@ for (let i in extensionModules) {   // for each module
 }
 
 /*
+let method = "GET";
+let methodFunc = getExpressMethodFunctionBindedToApp(method);
+let pathname = "/hi";
+let apiPath = "/services" + pathname;
+if (apiPath.substr(apiPath.length - 1, 1) === "/") apiPath = apiPath.substr(0, apiPath.length - 1);
+methodFunc(apiPath, [
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        req["__my_msg"] = "How are you ladies?";
+        next();
+    },(req: express.Request, res: express.Response) => {
+        res.jsonp(req["__my_msg"]);
+    }
+]);
+
 app.get("/services/hi", (req: express.Request, res: express.Response) => {
     res.jsonp({msg: "How are you sir?"});
     //setTimeout(() => {res.jsonp({msg: "How are you?"});}, 45000);
