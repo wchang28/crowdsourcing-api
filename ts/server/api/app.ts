@@ -34,17 +34,6 @@ function flagTerminationPending() {
         process.exit(0);
 }
 
-
-let app = express();
-
-app.set('jsonp callback name', 'cb');
-
-app.use(noCache);
-app.use(bodyParser.text({"limit":"999mb"}));
-app.use(bodyParser.json({"limit":"999mb"}));
-app.use(prettyPrinter.get());
-
-
 /*
 let terminationPending = false;
 let count = 0;
@@ -88,6 +77,18 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
     next();
 });
 */
+
+let app = express();
+
+app.set('jsonp callback name', 'cb');
+
+app.use(noCache);
+app.use(bodyParser.text({"limit":"999mb"}));
+app.use(bodyParser.json({"limit":"999mb"}));
+app.use(prettyPrinter.get());
+
+
+
 
 app.use(reqCounter.Middleware);
 
