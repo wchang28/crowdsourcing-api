@@ -18,8 +18,14 @@ class APIAppFactory extends events.EventEmitter implements IAPIAppFactory {
     create() : express.Express {    // create the api app
         let NODE_PATH = process.env["NODE_PATH"];
         if (!NODE_PATH) throw "env['NODE_PATH'] is not set";
+        
         let app = express();
         this.emit("app-just-created", app);
+
+        app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+            req.connection.setTimeout(20000);
+            next();
+        });
 
         app.set('jsonp callback name', 'cb');
 

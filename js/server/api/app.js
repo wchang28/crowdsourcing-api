@@ -26,9 +26,8 @@ function flagTerminationPending() {
 }
 var appFactory = af.get();
 appFactory.on("app-just-created", function (app) {
-    app.use(reqCounter.Middleware);
+    app.use(reqCounter.Middleware); // install request counter middleware to app
 });
-var app = appFactory.create();
 console.log(new Date().toISOString() + ": connecting to the msg server...");
 var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
 var msgClient = api.$M("/msg/events", { reconnetIntervalMS: 3000 });
@@ -44,7 +43,7 @@ msgClient.on("connect", function (conn_id) {
     }).then(function (sub_id) {
         console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
         console.log(new Date().toISOString() + ": starting the web server");
-        express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, app, function (secure, host, port) {
+        express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, appFactory.create(), function (secure, host, port) {
             var protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
             var content = { InstanceId: InstanceId, NODE_PATH: NODE_PATH };

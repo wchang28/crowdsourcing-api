@@ -27,6 +27,10 @@ var APIAppFactory = (function (_super) {
             throw "env['NODE_PATH'] is not set";
         var app = express();
         this.emit("app-just-created", app);
+        app.use(function (req, res, next) {
+            req.connection.setTimeout(20000);
+            next();
+        });
         app.set('jsonp callback name', 'cb');
         app.use(noCache);
         app.use(bodyParser.text({ "limit": "999mb" }));

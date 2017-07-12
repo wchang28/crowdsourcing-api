@@ -33,10 +33,8 @@ function flagTerminationPending() {
 let appFactory = af.get();
 
 appFactory.on("app-just-created", (app: express.Express) => {
-    app.use(reqCounter.Middleware);
+    app.use(reqCounter.Middleware); // install request counter middleware to app
 });
-
-let app = appFactory.create();
 
 console.log(new Date().toISOString() + ": connecting to the msg server...");
 let api = new rcf.AuthorizedRestApi(node$.get(), {instance_url: "http://127.0.0.1:" + MsgPort.toString()});
@@ -54,7 +52,7 @@ msgClient.on("connect", (conn_id: string) => {
         console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
         console.log(new Date().toISOString() + ": starting the web server");
 
-        startServer({http:{port: Port, host: "127.0.0.1"}}, app, (secure:boolean, host:string, port:number) => {
+        startServer({http:{port: Port, host: "127.0.0.1"}}, appFactory.create(), (secure:boolean, host:string, port:number) => {
             let protocol = (secure ? 'https' : 'http');
             console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
 
