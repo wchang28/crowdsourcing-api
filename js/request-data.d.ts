@@ -1,7 +1,7 @@
 /// <reference types="express" />
 import { IRequestData } from "./";
 import * as express from "express";
-import { IAuthorizedApiRoute } from "rcf";
+import { IAuthorizedApiRoute, OAuth2Access } from "rcf";
 export declare class RequestData implements IRequestData {
     req: express.Request;
     constructor(req: express.Request);
@@ -13,4 +13,5 @@ export declare class RequestData implements IRequestData {
     get(field: string): any;
     set(field: string, value: any): void;
     readonly SelfApiRoute: IAuthorizedApiRoute;
+    getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute;
 }

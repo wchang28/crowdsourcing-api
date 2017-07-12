@@ -1,6 +1,6 @@
 /// <reference types="express" />
 import * as express from "express";
-import { IAuthorizedApiRoute } from "rcf";
+import { IAuthorizedApiRoute, OAuth2Access } from "rcf";
 export { Request, Response, NextFunction, Router, RequestHandler } from "express";
 export * from "rcf";
 export { AppGlobal } from "./app-global";
@@ -15,5 +15,6 @@ export interface IRequestData {
     get(field: string): any;
     set(field: string, value: any): void;
     readonly SelfApiRoute: IAuthorizedApiRoute;
+    getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute;
 }
 export declare function getRequestData(req: express.Request): IRequestData;

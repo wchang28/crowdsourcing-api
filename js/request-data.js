@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var rcf_1 = require("rcf");
+var $node = require("rest-node");
 var RequestData = (function () {
     function RequestData(req) {
         this.req = req;
@@ -38,6 +40,7 @@ var RequestData = (function () {
         enumerable: true,
         configurable: true
     });
+    RequestData.prototype.getRestApiRoute = function (access) { return new rcf_1.AuthorizedRestApi($node.get(), access).mount("/"); };
     return RequestData;
 }());
 exports.RequestData = RequestData;

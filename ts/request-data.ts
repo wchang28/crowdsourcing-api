@@ -1,7 +1,8 @@
 import {IRequestData} from "./";
 import * as express from "express";
-import {IAuthorizedApiRoute} from "rcf";
+import {IAuthorizedApiRoute, AuthorizedRestApi, OAuth2Access} from "rcf";
 import {AppGlobal} from "./app-global";
+import * as $node from "rest-node";
 
 export class RequestData implements IRequestData {
     constructor(public req: express.Request) {
@@ -16,4 +17,5 @@ export class RequestData implements IRequestData {
     set(field: string, value: any) : void {(this.RequestInfo)[field] = value;}
 
     get SelfApiRoute(): IAuthorizedApiRoute {return this.Global.selfApiRoute;}
+    getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute {return new AuthorizedRestApi($node.get(), access).mount("/");}
 }
