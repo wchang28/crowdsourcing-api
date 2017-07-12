@@ -5,65 +5,87 @@ var rc = require("express-req-counter");
 var rcf = require("rcf");
 var node$ = require("rest-node");
 var af = require("./app-factory");
-var InstanceId = process.argv[2];
-var Port = parseInt(process.argv[3]);
-var MsgPort = parseInt(process.argv[4]);
 var NODE_PATH = process.env["NODE_PATH"];
-console.log("InstanceId=" + InstanceId);
-console.log("Port=" + Port);
-console.log("MsgPort=" + MsgPort);
+var Mode = null;
+var Port = (process.argv.length >= 3 ? parseInt(process.argv[2]) : 80);
+var MsgPort = null;
+var InstanceId = null;
+if (process.argv.length >= 4) {
+    Mode = "deploy";
+    MsgPort = parseInt(process.argv[3]);
+    InstanceId = process.argv[4];
+}
+else
+    Mode = "debug";
 console.log("NODE_PATH=" + NODE_PATH);
+console.log("Mode=" + Mode);
+console.log("Port=" + Port);
+if (Mode === "deploy") {
+    console.log("MsgPort=" + MsgPort);
+    console.log("InstanceId=" + InstanceId);
+}
 var terminationPending = false;
 var reqCounter = rc.get();
-reqCounter.on("zero-count", function () {
-    if (terminationPending)
-        process.exit(0);
-});
 function flagTerminationPending() {
     terminationPending = true;
     if (reqCounter.Counter === 0)
         process.exit(0);
 }
-var appFactory = af.get();
-appFactory.on("app-just-created", function (app) {
-    app.use(reqCounter.Middleware); // install request counter middleware to app
+reqCounter.on("zero-count", function () {
+    if (terminationPending)
+        process.exit(0);
 });
-console.log(new Date().toISOString() + ": connecting to the msg server...");
-var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
-var msgClient = api.$M("/msg/events", { reconnetIntervalMS: 3000 });
-msgClient.on("connect", function (conn_id) {
-    console.log(new Date().toISOString() + ": connected to the msg server :-) conn_id=" + conn_id);
-    msgClient.subscribe("/topic/" + InstanceId, function (msg) {
-        if (msg.body) {
-            var message = msg.body;
-            if (message.type === "terminate") {
-                flagTerminationPending();
+var appFactory = af.get();
+if (Mode === "deploy") {
+    appFactory.on("app-just-created", function (app) {
+        app.use(reqCounter.Middleware); // install the request counter middleware to app
+    });
+    console.log(new Date().toISOString() + ": connecting to the gateway msg server...");
+    var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
+    var msgClient_1 = api.$M("/msg/events", { reconnetIntervalMS: 3000 });
+    msgClient_1.on("connect", function (conn_id) {
+        console.log(new Date().toISOString() + ": connected to the gateway msg server :-) conn_id=" + conn_id);
+        msgClient_1.subscribe("/topic/" + InstanceId, function (msg) {
+            if (msg.body) {
+                var message = msg.body;
+                if (message.type === "terminate") {
+                    flagTerminationPending();
+                }
             }
-        }
-    }).then(function (sub_id) {
-        console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
-        console.log(new Date().toISOString() + ": starting the web server");
-        express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, appFactory.create(), function (secure, host, port) {
-            var protocol = (secure ? 'https' : 'http');
-            console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-            var content = { InstanceId: InstanceId, NODE_PATH: NODE_PATH };
-            var msg = { type: "ready", content: content };
-            msgClient.send("/topic/gateway", {}, msg).then(function () {
-                console.log(new Date().toISOString() + ": <<ready>> message sent");
-            }).catch(function (err) {
+        }).then(function (sub_id) {
+            console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
+            console.log(new Date().toISOString() + ": starting the web server");
+            express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, appFactory.create(), function (secure, host, port) {
+                var protocol = (secure ? 'https' : 'http');
+                console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
+                var content = { InstanceId: InstanceId, NODE_PATH: NODE_PATH };
+                var msg = { type: "ready", content: content };
+                msgClient_1.send("/topic/gateway", {}, msg).then(function () {
+                    console.log(new Date().toISOString() + ": <<ready>> message sent");
+                }).catch(function (err) {
+                    console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
+                    process.exit(1);
+                });
+            }, function (err) {
                 console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
                 process.exit(1);
             });
-        }, function (err) {
-            console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
+        }).catch(function (err) {
+            console.error(new Date().toISOString() + ': !!! Error subscribing to topic: ' + JSON.stringify(err));
             process.exit(1);
         });
-    }).catch(function (err) {
-        console.error(new Date().toISOString() + ': !!! Error subscribing to topic: ' + JSON.stringify(err));
+    }).on("error", function (err) {
+        console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));
+    }).on("ping", function () {
+        console.log(new Date().toISOString() + ": <<PING>>");
+    });
+}
+else {
+    express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, appFactory.create(), function (secure, host, port) {
+        var protocol = (secure ? 'https' : 'http');
+        console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
+    }, function (err) {
+        console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
         process.exit(1);
     });
-}).on("error", function (err) {
-    console.error(new Date().toISOString() + ': !!! Error: ' + JSON.stringify(err));
-}).on("ping", function () {
-    console.log(new Date().toISOString() + ": <<PING>>");
-});
+}
