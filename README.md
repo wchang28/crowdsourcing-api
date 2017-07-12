@@ -1,1 +1,1 @@
-# Crowdsourcing API and Server
+# Crowdsourcing API
