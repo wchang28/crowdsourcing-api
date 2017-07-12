@@ -27,6 +27,18 @@ if (Mode === "deploy") {
     console.log("InstanceId=" + InstanceId);
 }
 
+function startApiAppServer(appFactory: af.IAPIAppFactory, port: number, callback?: () => void) {
+    console.log(new Date().toISOString() + ": starting the crowdsourcing api server...");
+    startServer({http:{port, host: "127.0.0.1"}}, appFactory.create(), (secure:boolean, host:string, port:number) => {
+        let protocol = (secure ? 'https' : 'http');
+        console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
+        if (typeof callback === "function") callback();
+    }, (err:any) => {
+        console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
+        process.exit(1);
+    });
+}
+
 let terminationPending = false;
 
 let reqCounter = rc.get();
@@ -42,7 +54,7 @@ reqCounter.on("zero-count", () => {
         process.exit(0);
 })
 
-let appFactory = af.get();
+let appFactory = af.get({});
 
 if (Mode === "deploy") {
     appFactory.on("app-just-created", (app: express.Express) => {
@@ -63,12 +75,7 @@ if (Mode === "deploy") {
             }
         }).then((sub_id: string) => {
             console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
-            console.log(new Date().toISOString() + ": starting the crowdsourcing api server...");
-
-            startServer({http:{port: Port, host: "127.0.0.1"}}, appFactory.create(), (secure:boolean, host:string, port:number) => {
-                let protocol = (secure ? 'https' : 'http');
-                console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-
+            startApiAppServer(appFactory, Port, () => {
                 let content: ReadyContent = {InstanceId, NODE_PATH};
                 let msg: Message = {type: "ready", content};
                 msgClient.send("/topic/gateway", {}, msg).then(() => {
@@ -77,9 +84,6 @@ if (Mode === "deploy") {
                     console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
                     process.exit(1);
                 });
-            }, (err:any) => {
-                console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
-                process.exit(1);
             });
         }).catch((err: any) => {
             console.error(new Date().toISOString() + ': !!! Error subscribing to topic: ' + JSON.stringify(err));
@@ -90,13 +94,5 @@ if (Mode === "deploy") {
     }).on("ping", () => {
         console.log(new Date().toISOString() + ": <<PING>>");
     });
-} else {    // debug
-    console.log(new Date().toISOString() + ": starting the crowdsourcing api server...");
-    startServer({http:{port: Port, host: "127.0.0.1"}}, appFactory.create(), (secure:boolean, host:string, port:number) => {
-        let protocol = (secure ? 'https' : 'http');
-        console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
-    }, (err:any) => {
-        console.error(new Date().toISOString() + ': !!! crowdsourcing api server error: ' + JSON.stringify(err));
-        process.exit(1);
-    });
-}
+} else    // debug
+    startApiAppServer(appFactory, Port);

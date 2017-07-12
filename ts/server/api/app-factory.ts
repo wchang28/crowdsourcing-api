@@ -1,3 +1,4 @@
+// app factory for the crowdsourcing api server
 import * as events from "events";
 import * as express from 'express';
 import * as bodyParser from "body-parser";
@@ -11,8 +12,12 @@ export interface IAPIAppFactory {
     on(event: "app-just-created", listener: (app: express.Express) => void) : this;
 }
 
+export interface AppFactoryOptions {
+
+};
+
 class APIAppFactory extends events.EventEmitter implements IAPIAppFactory {
-    constructor() {
+    constructor(private options: AppFactoryOptions) {
         super();
     }
     create() : express.Express {    // create the api app
@@ -22,10 +27,12 @@ class APIAppFactory extends events.EventEmitter implements IAPIAppFactory {
         let app = express();
         this.emit("app-just-created", app);
 
+        /*
         app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
             req.connection.setTimeout(20000);
             next();
         });
+        */
 
         app.set('jsonp callback name', 'cb');
 
@@ -67,4 +74,4 @@ class APIAppFactory extends events.EventEmitter implements IAPIAppFactory {
     } 
 }
 
-export function get() : IAPIAppFactory {return new APIAppFactory();}
+export function get(options: AppFactoryOptions) : IAPIAppFactory {return new APIAppFactory(options);}
