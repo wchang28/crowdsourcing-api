@@ -8,7 +8,7 @@ import {getAllExtensionModules} from "../extensions";
 import {ExtensionModuleExport} from "../../index";
 import * as rcf from "rcf";
 import * as node$ from "rest-node";
-import {IGlobal} from "./global";
+import {AppGlobal} from "../../app-global";
 
 export interface IAPIAppFactory {
     readonly SelfPort: number;
@@ -60,7 +60,7 @@ class APIAppFactory extends events.EventEmitter implements IAPIAppFactory {
 
         let selfApi = new rcf.AuthorizedRestApi(node$.get(), {instance_url: "http://127.0.0.1:" + this.SelfPort.toString()});
         let selfApiRoute = selfApi.mount("/");
-        let g: IGlobal = {
+        let g: AppGlobal = {
             selfApiRoute
         };
 

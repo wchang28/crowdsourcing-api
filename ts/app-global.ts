@@ -1,5 +1,5 @@
 import {IAuthorizedApiRoute} from "rcf";
 
-export interface IGlobal {
+export interface AppGlobal {
     selfApiRoute: IAuthorizedApiRoute;
 }
