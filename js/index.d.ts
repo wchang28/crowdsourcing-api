@@ -11,6 +11,8 @@ export interface IRequestData {
     readonly Query: any;
     readonly Params: any;
     readonly Body: any;
+    get(field: string): any;
+    set(field: string, value: any): void;
     readonly SelfApiRoute: IAuthorizedApiRoute;
 }
 export declare function getRequestData(req: express.Request): IRequestData;

@@ -31,6 +31,8 @@ var RequestData = (function () {
         enumerable: true,
         configurable: true
     });
+    RequestData.prototype.get = function (field) { return (this.RequestInfo)[field]; };
+    RequestData.prototype.set = function (field, value) { (this.RequestInfo)[field] = value; };
     Object.defineProperty(RequestData.prototype, "SelfApiRoute", {
         get: function () { return this.Global.selfApiRoute; },
         enumerable: true,
