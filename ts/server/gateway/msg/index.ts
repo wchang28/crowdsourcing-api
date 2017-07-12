@@ -24,8 +24,8 @@ let options: tr.Options = {
     //,destinationAuthorizeRouter: destAuthRouter
 }
 
-let ret = tr.get('/event_stream', options);
-router.use('/events', ret.router); // topic subscription endpoint is available at /events/event_stream from this route
+let ret = tr.get('/', options);
+router.use('/events', ret.router); // topic subscription endpoint is available at /events from this route
 let connectionsManager = ret.connectionsManager;
 
 connectionsManager.on('client_connect', (req:express.Request, connection: tr.ITopicConnection) : void => {

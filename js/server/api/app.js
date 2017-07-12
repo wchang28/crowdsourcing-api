@@ -31,7 +31,7 @@ appFactory.on("app-just-created", function (app) {
 var app = appFactory.create();
 console.log(new Date().toISOString() + ": connecting to the msg server...");
 var api = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + MsgPort.toString() });
-var msgClient = api.$M("/msg/events/event_stream", { reconnetIntervalMS: 3000 });
+var msgClient = api.$M("/msg/events", { reconnetIntervalMS: 3000 });
 msgClient.on("connect", function (conn_id) {
     console.log(new Date().toISOString() + ": connected to the msg server :-) conn_id=" + conn_id);
     msgClient.subscribe("/topic/" + InstanceId, function (msg) {

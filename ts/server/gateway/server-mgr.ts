@@ -40,8 +40,8 @@ class ServerManager extends events.EventEmitter implements sm.IServerManager {
     }
     private launchInstance(InstanceId: ServerId, Port: number) : Promise<any> {
         let apiAppScript = path.join(__dirname, "../api/app.js");
-        //cp.spawn("node", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], {env: {"NODE_PATH": this.NODE_PATH}});
-        cp.spawn("c:\\run\\cmd\\helper.bat", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], {env: {"NODE_PATH": this.NODE_PATH}});
+        cp.spawn("node", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], {env: {"NODE_PATH": this.NODE_PATH}});
+        //cp.spawn("c:\\run\\cmd\\helper.bat", [apiAppScript, InstanceId, Port.toString(), this.msgPort.toString()], {env: {"NODE_PATH": this.NODE_PATH}});
         return Promise.resolve<any>(null);
     }
     launchNewInstance() : Promise<sm.ServerInstance> {

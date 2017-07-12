@@ -22,8 +22,8 @@ var options = {
     dispatchMsgOnClientSend: false
     //,destinationAuthorizeRouter: destAuthRouter
 };
-var ret = tr.get('/event_stream', options);
-router.use('/events', ret.router); // topic subscription endpoint is available at /events/event_stream from this route
+var ret = tr.get('/', options);
+router.use('/events', ret.router); // topic subscription endpoint is available at /events from this route
 var connectionsManager = ret.connectionsManager;
 exports.ConnectionsManager = connectionsManager;
 connectionsManager.on('client_connect', function (req, connection) {
