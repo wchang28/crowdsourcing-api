@@ -17,6 +17,8 @@ var bodyParser = require("body-parser");
 var noCache = require("no-cache-express");
 var prettyPrinter = require("express-pretty-print");
 var extensions_1 = require("../extensions");
+var rcf = require("rcf");
+var node$ = require("rest-node");
 ;
 var APIAppFactory = (function (_super) {
     __extends(APIAppFactory, _super);
@@ -25,6 +27,11 @@ var APIAppFactory = (function (_super) {
         _this.options = options;
         return _this;
     }
+    Object.defineProperty(APIAppFactory.prototype, "SelfPort", {
+        get: function () { return this.options.SelfPort; },
+        enumerable: true,
+        configurable: true
+    });
     APIAppFactory.prototype.create = function () {
         var NODE_PATH = process.env["NODE_PATH"];
         if (!NODE_PATH)
@@ -52,6 +59,12 @@ var APIAppFactory = (function (_super) {
             res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Content-Length,X-Requested-With');
             res.send(200);
         });
+        var selfApi = new rcf.AuthorizedRestApi(node$.get(), { instance_url: "http://127.0.0.1:" + this.SelfPort.toString() });
+        var selfApiRoute = selfApi.mount("/");
+        var g = {
+            selfApiRoute: selfApiRoute
+        };
+        app.set("global", g); // set the global object
         var serviceRouter = express.Router();
         var extensionModules = extensions_1.getAllExtensionModules(NODE_PATH);
         for (var i in extensionModules) {

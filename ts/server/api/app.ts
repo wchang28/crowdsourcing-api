@@ -54,7 +54,7 @@ reqCounter.on("zero-count", () => {
         process.exit(0);
 })
 
-let appFactory = af.get({});
+let appFactory = af.get({SelfPort: Port});
 
 if (Mode === "deploy") {
     appFactory.on("app-just-created", (app: express.Express) => {

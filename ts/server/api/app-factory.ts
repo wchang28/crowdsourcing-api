@@ -6,20 +6,25 @@ import noCache = require('no-cache-express');
 import * as prettyPrinter from 'express-pretty-print';
 import {getAllExtensionModules} from "../extensions";
 import {ExtensionModuleExport} from "../../index";
+import * as rcf from "rcf";
+import * as node$ from "rest-node";
+import {IGlobal} from "./global";
 
 export interface IAPIAppFactory {
+    readonly SelfPort: number;
     create() : express.Express;
     on(event: "app-just-created", listener: (app: express.Express) => void) : this;
 }
 
 export interface AppFactoryOptions {
-
+    SelfPort: number;
 };
 
 class APIAppFactory extends events.EventEmitter implements IAPIAppFactory {
     constructor(private options: AppFactoryOptions) {
         super();
     }
+    get SelfPort(): number {return this.options.SelfPort;}
     create() : express.Express {    // create the api app
         let NODE_PATH = process.env["NODE_PATH"];
         if (!NODE_PATH) throw "env['NODE_PATH'] is not set";
@@ -53,6 +58,14 @@ class APIAppFactory extends events.EventEmitter implements IAPIAppFactory {
             res.send(200);
         });
 
+        let selfApi = new rcf.AuthorizedRestApi(node$.get(), {instance_url: "http://127.0.0.1:" + this.SelfPort.toString()});
+        let selfApiRoute = selfApi.mount("/");
+        let g: IGlobal = {
+            selfApiRoute
+        };
+
+        app.set("global", g);   // set the global object
+        
         let serviceRouter = express.Router();
 
         let extensionModules = getAllExtensionModules(NODE_PATH);

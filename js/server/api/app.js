@@ -47,7 +47,7 @@ reqCounter.on("zero-count", function () {
     if (terminationPending)
         process.exit(0);
 });
-var appFactory = af.get({});
+var appFactory = af.get({ SelfPort: Port });
 if (Mode === "deploy") {
     appFactory.on("app-just-created", function (app) {
         app.use(reqCounter.Middleware); // install the request counter middleware to app
