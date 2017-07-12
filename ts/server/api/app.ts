@@ -63,7 +63,7 @@ if (Mode === "deploy") {
             }
         }).then((sub_id: string) => {
             console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
-            console.log(new Date().toISOString() + ": starting the web server");
+            console.log(new Date().toISOString() + ": starting the crowdsourcing api server...");
 
             startServer({http:{port: Port, host: "127.0.0.1"}}, appFactory.create(), (secure:boolean, host:string, port:number) => {
                 let protocol = (secure ? 'https' : 'http');
@@ -91,6 +91,7 @@ if (Mode === "deploy") {
         console.log(new Date().toISOString() + ": <<PING>>");
     });
 } else {    // debug
+    console.log(new Date().toISOString() + ": starting the crowdsourcing api server...");
     startServer({http:{port: Port, host: "127.0.0.1"}}, appFactory.create(), (secure:boolean, host:string, port:number) => {
         let protocol = (secure ? 'https' : 'http');
         console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);

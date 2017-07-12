@@ -54,7 +54,7 @@ if (Mode === "deploy") {
             }
         }).then(function (sub_id) {
             console.log(new Date().toISOString() + ": topic subscription successful, sub_id=" + sub_id);
-            console.log(new Date().toISOString() + ": starting the web server");
+            console.log(new Date().toISOString() + ": starting the crowdsourcing api server...");
             express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, appFactory.create(), function (secure, host, port) {
                 var protocol = (secure ? 'https' : 'http');
                 console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
@@ -81,6 +81,7 @@ if (Mode === "deploy") {
     });
 }
 else {
+    console.log(new Date().toISOString() + ": starting the crowdsourcing api server...");
     express_web_server_1.startServer({ http: { port: Port, host: "127.0.0.1" } }, appFactory.create(), function (secure, host, port) {
         var protocol = (secure ? 'https' : 'http');
         console.log(new Date().toISOString() + ': crowdsourcing api server listening at %s://%s:%s', protocol, host, port);
