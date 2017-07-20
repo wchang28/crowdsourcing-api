@@ -15,6 +15,7 @@
     "@types/express": "^4.0.36",
     "express": "^4.15.3",
     "rcf": "https://github.com/wchang28/rcf.git",
+    "request-data": "https://github.com/wchang28/request-data.git",
     "rest-node": "https://github.com/wchang28/rest-node.git"
   }
 }
