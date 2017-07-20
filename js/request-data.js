@@ -26,9 +26,8 @@ var RequestData = (function (_super) {
     RequestData.prototype.getRestApiRoute = function (access) { return new rcf_1.AuthorizedRestApi($node.get(), access).mount("/"); };
     return RequestData;
 }(rqd.RequestData));
-exports.RequestData = RequestData;
-function get(req) { return new RequestData(req); }
-exports.get = get;
+function getRequestData(req) { return new RequestData(req); }
+exports.getRequestData = getRequestData;
 function Endware(handler) {
     return rqd.EndwareTemplete(function (req) { return new RequestData(req); }, handler);
 }

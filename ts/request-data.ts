@@ -10,15 +10,13 @@ export interface IRequestData extends rqd.IRequestData<AppGlobal> {
     getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute;
 }
 
-export class RequestData extends rqd.RequestData<AppGlobal> implements IRequestData {
-    constructor(req: express.Request) {
-        super(req);
-    }
+class RequestData extends rqd.RequestData<AppGlobal> implements IRequestData {
+    constructor(req: express.Request) {super(req);}
     get SelfApiRoute(): IAuthorizedApiRoute {return this.Global.selfApiRoute;}
     getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute {return new AuthorizedRestApi($node.get(), access).mount("/");}
 }
 
-export function get(req: express.Request) : IRequestData {return new RequestData(req);}
+export function getRequestData(req: express.Request) : IRequestData {return new RequestData(req);}
 
 export type EndwareHandler<T> = rqd.EndwareHandler<IRequestData, T>;
 export type ResourceMiddlewareHandler<T> = rqd.ResourceMiddlewareHandler<IRequestData, T>;

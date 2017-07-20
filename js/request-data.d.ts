@@ -8,12 +8,7 @@ export interface IRequestData extends rqd.IRequestData<AppGlobal> {
     readonly SelfApiRoute: IAuthorizedApiRoute;
     getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute;
 }
-export declare class RequestData extends rqd.RequestData<AppGlobal> implements IRequestData {
-    constructor(req: express.Request);
-    readonly SelfApiRoute: IAuthorizedApiRoute;
-    getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute;
-}
-export declare function get(req: express.Request): IRequestData;
+export declare function getRequestData(req: express.Request): IRequestData;
 export declare type EndwareHandler<T> = rqd.EndwareHandler<IRequestData, T>;
 export declare type ResourceMiddlewareHandler<T> = rqd.ResourceMiddlewareHandler<IRequestData, T>;
 export declare type PermissionMiddlewareHandler = rqd.PermissionMiddlewareHandler<IRequestData>;

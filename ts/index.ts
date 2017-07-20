@@ -10,4 +10,4 @@ export interface ExtensionModuleExport {
     init(moduleRouter: express.Router): void;
 }
 
-export {IRequestData, get as getRequestData, Endware, EndwareHandler, ResourceMiddleware, ResourceMiddlewareHandler, PermissionMiddleware, PermissionMiddlewareHandler} from "./request-data";
+export * from "./request-data";
