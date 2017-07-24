@@ -41,7 +41,7 @@ export function CGIEndware(contentType: string, handler: CGIEndwareHandler) : ex
     let h = (rqd: IRequestData) => {
         return handler(rqd).then((stdout: Readable) => {
             let content: rqd.ReadableStreamContent = {
-                 info: {
+                info: {
                      type: contentType
                 }
                 ,readable: stdout
