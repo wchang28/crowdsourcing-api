@@ -28,15 +28,35 @@ var RequestData = (function (_super) {
 }(rqd.RequestData));
 function getRequestData(req) { return new RequestData(req); }
 exports.getRequestData = getRequestData;
-function Endware(handler) {
-    return rqd.EndwareTemplete(function (req) { return new RequestData(req); }, handler);
+var factory = function (req) { return new RequestData(req); };
+function JSONEndware(handler) {
+    return rqd.JSONEndwareTemplete(factory, handler);
 }
-exports.Endware = Endware;
+exports.JSONEndware = JSONEndware;
+function ReadableStreamEndware(handler) {
+    return rqd.ReadableStreamEndwareTemplete(factory, handler);
+}
+exports.ReadableStreamEndware = ReadableStreamEndware;
+function CGIEndware(contentType, handler) {
+    var h = function (rqd) {
+        return handler(rqd).then(function (stdout) {
+            var content = {
+                info: {
+                    type: contentType
+                },
+                readable: stdout
+            };
+            return content;
+        });
+    };
+    return ReadableStreamEndware(h);
+}
+exports.CGIEndware = CGIEndware;
 function ResourceMiddleware(handler, storageKey) {
-    return rqd.ResourceMiddlewareTemplete(function (req) { return new RequestData(req); }, handler, storageKey);
+    return rqd.ResourceMiddlewareTemplete(factory, handler, storageKey);
 }
 exports.ResourceMiddleware = ResourceMiddleware;
 function PermissionMiddleware(handler) {
-    return rqd.PermissionMiddlewareTemplete(function (req) { return new RequestData(req); }, handler);
+    return rqd.PermissionMiddlewareTemplete(factory, handler);
 }
 exports.PermissionMiddleware = PermissionMiddleware;
