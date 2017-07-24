@@ -23,6 +23,11 @@ var RequestData = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(RequestData.prototype, "CGIChildProcessLauncher", {
+        get: function () { return this.Global.cgiChildProcessLauncher; },
+        enumerable: true,
+        configurable: true
+    });
     RequestData.prototype.getRestApiRoute = function (access) { return new rcf_1.AuthorizedRestApi($node.get(), access).mount("/"); };
     return RequestData;
 }(rqd.RequestData));

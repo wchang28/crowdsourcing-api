@@ -2,18 +2,20 @@ import {IRequestData} from "./";
 import * as express from "express";
 import * as rqd from "request-data";
 import {IAuthorizedApiRoute, AuthorizedRestApi, OAuth2Access} from "rcf";
-import {AppGlobal} from "./app-global";
+import {AppGlobal, CGIChildProcessLauncher} from "./app-global";
 import * as $node from "rest-node";
 import {Readable} from "stream";
 
 export interface IRequestData extends rqd.IRequestData<AppGlobal> {
     readonly SelfApiRoute: IAuthorizedApiRoute;
+    readonly CGIChildProcessLauncher: CGIChildProcessLauncher;
     getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute;
 }
 
 class RequestData extends rqd.RequestData<AppGlobal> implements IRequestData {
     constructor(req: express.Request) {super(req);}
     get SelfApiRoute(): IAuthorizedApiRoute {return this.Global.selfApiRoute;}
+    get CGIChildProcessLauncher(): CGIChildProcessLauncher {return this.Global.cgiChildProcessLauncher;}
     getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute {return new AuthorizedRestApi($node.get(), access).mount("/");}
 }
 

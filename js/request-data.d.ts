@@ -4,10 +4,11 @@ import { IRequestData } from "./";
 import * as express from "express";
 import * as rqd from "request-data";
 import { IAuthorizedApiRoute, OAuth2Access } from "rcf";
-import { AppGlobal } from "./app-global";
+import { AppGlobal, CGIChildProcessLauncher } from "./app-global";
 import { Readable } from "stream";
 export interface IRequestData extends rqd.IRequestData<AppGlobal> {
     readonly SelfApiRoute: IAuthorizedApiRoute;
+    readonly CGIChildProcessLauncher: CGIChildProcessLauncher;
     getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute;
 }
 export declare function getRequestData(req: express.Request): IRequestData;
