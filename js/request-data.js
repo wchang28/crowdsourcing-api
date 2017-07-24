@@ -18,6 +18,11 @@ var RequestData = (function (_super) {
     function RequestData(req) {
         return _super.call(this, req) || this;
     }
+    Object.defineProperty(RequestData.prototype, "ThisModule", {
+        get: function () { return this.get("__ThisExtension__"); },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(RequestData.prototype, "SelfApiRoute", {
         get: function () { return this.Global.selfApiRoute; },
         enumerable: true,

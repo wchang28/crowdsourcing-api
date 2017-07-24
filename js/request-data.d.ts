@@ -1,12 +1,13 @@
 /// <reference types="express" />
 /// <reference types="node" />
-import { IRequestData } from "./";
+import { ExtensionModule } from "./";
 import * as express from "express";
 import * as rqd from "request-data";
 import { IAuthorizedApiRoute, OAuth2Access } from "rcf";
 import { AppGlobal, CGIChildProcessLauncher } from "./app-global";
 import { Readable } from "stream";
 export interface IRequestData extends rqd.IRequestData<AppGlobal> {
+    readonly ThisModule: ExtensionModule;
     readonly SelfApiRoute: IAuthorizedApiRoute;
     readonly CGIChildProcessLauncher: CGIChildProcessLauncher;
     getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute;
