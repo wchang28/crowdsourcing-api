@@ -16,7 +16,7 @@ export interface IRequestData extends rqd.IRequestData<AppGlobal> {
 class RequestData extends rqd.RequestData<AppGlobal> implements IRequestData {
     constructor(req: express.Request) {super(req);}
     get ThisModule() : ExtensionModule {return this.get<ExtensionModule>("__ThisExtension__")}
-    get SelfApiRoute(): IAuthorizedApiRoute {return this.Global.selfApiRoute;}
+    get SelfApiRoute(): IAuthorizedApiRoute {return this.get<IAuthorizedApiRoute>("__SelfApiRoute__");}
     get CGIChildProcessLauncher(): CGIChildProcessLauncher {return this.Global.cgiChildProcessLauncher;}
     getRestApiRoute(access: OAuth2Access): IAuthorizedApiRoute {return new AuthorizedRestApi($node.get(), access).mount("/");}
 }

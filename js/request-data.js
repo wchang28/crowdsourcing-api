@@ -24,7 +24,7 @@ var RequestData = (function (_super) {
         configurable: true
     });
     Object.defineProperty(RequestData.prototype, "SelfApiRoute", {
-        get: function () { return this.Global.selfApiRoute; },
+        get: function () { return this.get("__SelfApiRoute__"); },
         enumerable: true,
         configurable: true
     });

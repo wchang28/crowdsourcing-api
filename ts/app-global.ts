@@ -7,6 +7,5 @@ export interface CGIChildProcessLauncher {
 } 
 
 export interface AppGlobal {
-    selfApiRoute: IAuthorizedApiRoute;
     cgiChildProcessLauncher: CGIChildProcessLauncher;
 }
