@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var rqd = require("request-data");
 var rcf_1 = require("rcf");
 var $node = require("rest-node");
-var RequestData = (function (_super) {
+var RequestData = /** @class */ (function (_super) {
     __extends(RequestData, _super);
     function RequestData(req) {
         return _super.call(this, req) || this;
